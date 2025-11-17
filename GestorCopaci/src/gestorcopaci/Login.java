@@ -4,6 +4,8 @@
  */
 package gestorcopaci;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author manue
@@ -161,28 +163,36 @@ public class Login extends javax.swing.JFrame {
     String usuario = txtUsuario.getText().trim();
     String password = new String(txtPassword.getPassword());
     
+    // Validar campos vacíos
     if (usuario.isEmpty() || password.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
+        JOptionPane.showMessageDialog(this, 
             "Por favor, complete todos los campos", 
             "Error de validación", 
-            javax.swing.JOptionPane.WARNING_MESSAGE);
+            JOptionPane.WARNING_MESSAGE);
         return;
     }
     
-    // Aquí va tu lógica de autenticación
+    // Validar credenciales (aquí puedes cambiar por tu lógica)
     if (usuario.equals("admin") && password.equals("1234")) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
+        JOptionPane.showMessageDialog(this, 
             "¡Bienvenido a Copaci!", 
             "Login exitoso", 
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        // Abrir ventana principal
-        // new VentanaPrincipal().setVisible(true);
-        // this.dispose();
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        // 🔥 REDIRIGIR A LA PÁGINA PRINCIPAL
+        Principal principal = new Principal();
+        principal.setVisible(true);
+        
+        // Cerrar el login
+        this.dispose();
+        
     } else {
-        javax.swing.JOptionPane.showMessageDialog(this, 
+        JOptionPane.showMessageDialog(this, 
             "Usuario o contraseña incorrectos", 
             "Error de autenticación", 
-            javax.swing.JOptionPane.ERROR_MESSAGE);
+            JOptionPane.ERROR_MESSAGE);
+            
+        // Limpiar campos
         txtPassword.setText("");
         txtUsuario.requestFocus();
     }
