@@ -1,0 +1,43 @@
+# ----------------------------------------
+# ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# ----------------------------------------
+src/main/resources/db.properties
+
+# ----------------------------------------
+# JAVA / MAVEN
+# ----------------------------------------
+target/
+*.class
+
+# IntelliJ
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.tmp
+
+# ----------------------------------------
+# BUILD / GRADLE 
+# ----------------------------------------
+build/
+.gradle/
+
+# ----------------------------------------
+# NETBEANS
+# ----------------------------------------
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+build/
+
