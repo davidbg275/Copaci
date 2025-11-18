@@ -17,15 +17,24 @@ import java.util.List;
 
 public class DonacionesController {
 
-    @FXML private TextField txtIdCiudadano;
-    @FXML private TextField txtConcepto;
-    @FXML private TextField txtMonto;
-    @FXML private DatePicker dpFechaDonacion;
-    @FXML private Button btnGuardar;
-    @FXML private Button btnLimpiar;
-    @FXML private Button btnCancelar;
-    @FXML private Label lblNombreCiudadano;
-    @FXML private Label lblTotalDonaciones;
+    @FXML
+    private TextField txtIdCiudadano;
+    @FXML
+    private TextField txtConcepto;
+    @FXML
+    private TextField txtMonto;
+    @FXML
+    private DatePicker dpFechaDonacion;
+    @FXML
+    private Button btnGuardar;
+    @FXML
+    private Button btnLimpiar;
+    @FXML
+    private Button btnCancelar;
+    @FXML
+    private Label lblNombreCiudadano;
+    @FXML
+    private Label lblTotalDonaciones;
 
     private DonacionDAO donacionDAO;
     private CiudadanoDAO ciudadanoDAO;
@@ -37,7 +46,7 @@ public class DonacionesController {
         configurarEventos();
         dpFechaDonacion.setValue(LocalDate.now());
         actualizarTotalDonaciones();
-        
+
         // Listener para buscar ciudadano automáticamente
         txtIdCiudadano.textProperty().addListener((observable, oldValue, newValue) -> {
             buscarCiudadano();
@@ -60,7 +69,7 @@ public class DonacionesController {
         try {
             int idCiudadano = Integer.parseInt(idText);
             List<Ciudadano> ciudadanos = ciudadanoDAO.obtenerTodosCiudadanos();
-            
+
             for (Ciudadano ciudadano : ciudadanos) {
                 if (ciudadano.getIdCiudadano() == idCiudadano) {
                     lblNombreCiudadano.setText("Ciudadano: " + ciudadano.getNombre());
@@ -68,10 +77,10 @@ public class DonacionesController {
                     return;
                 }
             }
-            
+
             lblNombreCiudadano.setText("Ciudadano no encontrado");
             lblNombreCiudadano.setStyle("-fx-text-fill: #f44336; -fx-font-weight: bold;");
-            
+
         } catch (NumberFormatException e) {
             lblNombreCiudadano.setText("ID inválido");
             lblNombreCiudadano.setStyle("-fx-text-fill: #f44336; -fx-font-weight: bold;");
@@ -85,11 +94,10 @@ public class DonacionesController {
 
         try {
             Donacion donacion = new Donacion(
-                Integer.parseInt(txtIdCiudadano.getText().trim()),
-                txtConcepto.getText().trim(),
-                Double.parseDouble(txtMonto.getText().trim()),
-                dpFechaDonacion.getValue()
-            );
+                    Integer.parseInt(txtIdCiudadano.getText().trim()),
+                    txtConcepto.getText().trim(),
+                    Double.parseDouble(txtMonto.getText().trim()),
+                    dpFechaDonacion.getValue());
 
             if (donacionDAO.insertarDonacion(donacion)) {
                 mostrarAlerta("Éxito", "Donación registrada correctamente", Alert.AlertType.INFORMATION);
