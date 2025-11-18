@@ -72,7 +72,7 @@ public class DonacionesController {
 
             for (Ciudadano ciudadano : ciudadanos) {
                 if (ciudadano.getIdCiudadano() == idCiudadano) {
-                    lblNombreCiudadano.setText("Ciudadano: " + ciudadano.getNombre());
+                    lblNombreCiudadano.setText("ciudadano: " + ciudadano.getNombre());
                     lblNombreCiudadano.setStyle("-fx-text-fill: #4caf50; -fx-font-weight: bold;");
                     return;
                 }

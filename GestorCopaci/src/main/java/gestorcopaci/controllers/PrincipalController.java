@@ -28,8 +28,7 @@ public class PrincipalController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Image logo = new Image(
-                App.class.getResourceAsStream("images/logo1.jpg")
-        );
+                App.class.getResourceAsStream("images/logo1.jpg"));
         imgLogo.setImage(logo);
     }
 
@@ -44,28 +43,28 @@ public class PrincipalController implements Initializable {
         try {
             // Cargar la interfaz de registro de ciudadanos
             FXMLLoader loader = new FXMLLoader(
-                    App.class.getResource("views/registro_ciudadanos.fxml")
-            );
+                    App.class.getResource("views/registro_ciudadanos.fxml"));
             Parent root = loader.load();
-            
+
             // Crear nueva ventana
             Stage stage = new Stage();
             stage.setTitle("Registro de Ciudadanos - Sistema Copaci");
             stage.setScene(new Scene(root));
             stage.setResizable(true);
-            
+
             // Configurar para que se cierre correctamente
             stage.setOnCloseRequest(event -> {
                 lblTitulo.setText("Bienvenido al Sistema Copaci");
                 lblContenido.setText("Registro de ciudadanos cerrado");
             });
-            
+
             stage.show();
-            
+
             // Actualizar la interfaz principal
             lblTitulo.setText("Módulo de Registro - Ciudadanos");
-            lblContenido.setText("Ventana de registro de ciudadanos abierta. Puede minimizar esta ventana para acceder al formulario.");
-            
+            lblContenido.setText(
+                    "Ventana de registro de ciudadanos abierta. Puede minimizar esta ventana para acceder al formulario.");
+
         } catch (Exception e) {
             e.printStackTrace();
             error("Error", "No se pudo abrir el módulo de registro:\n" + e.getMessage());
@@ -88,9 +87,35 @@ public class PrincipalController implements Initializable {
 
     @FXML
     private void onDonaciones() {
-        lblTitulo.setText("Módulo de Donaciones");
-        lblContenido.setText("Aquí irá el manejo de donaciones.");
-        info("Donaciones", "Redirigiendo a: Módulo de Donaciones (por implementar)");
+        try {
+            // Cargar la interfaz de donaciones
+            FXMLLoader loader = new FXMLLoader(
+                    App.class.getResource("views/donaciones.fxml"));
+            Parent root = loader.load();
+
+            // Crear una nueva ventana
+            Stage stage = new Stage();
+            stage.setTitle("Gestión de Donaciones - Sistema Copaci");
+            stage.setScene(new Scene(root));
+            stage.setResizable(true);
+
+            // Evento al cerrar
+            stage.setOnCloseRequest(event -> {
+                lblTitulo.setText("Bienvenido al Sistema Copaci");
+                lblContenido.setText("Módulo de donaciones cerrado");
+            });
+
+            // Mostrar ventana
+            stage.show();
+
+            // Actualizar área principal
+            lblTitulo.setText("Módulo de Donaciones");
+            lblContenido.setText("Ventana de gestión de donaciones abierta.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            error("Error", "No se pudo abrir el módulo de Donaciones:\n" + e.getMessage());
+        }
     }
 
     @FXML
@@ -112,8 +137,7 @@ public class PrincipalController implements Initializable {
         Stage stage = (Stage) lblTitulo.getScene().getWindow();
         try {
             FXMLLoader loader = new FXMLLoader(
-                    App.class.getResource("views/login.fxml")
-            );
+                    App.class.getResource("views/login.fxml"));
             Scene scene = new Scene(loader.load());
             stage.setScene(scene);
             stage.setTitle("Copaci - Login");

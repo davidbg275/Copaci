@@ -43,7 +43,7 @@ public class CiudadanoDAO {
 
     public List<Ciudadano> obtenerTodosCiudadanos() {
         List<Ciudadano> ciudadanos = new ArrayList<>();
-        String sql = "SELECT * FROM Ciudadanos";
+        String sql = "SELECT * FROM ciudadanos";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
