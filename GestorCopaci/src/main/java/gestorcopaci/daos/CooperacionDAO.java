@@ -19,34 +19,36 @@ public class CooperacionDAO {
     private static final double PRECIO_PASEO = 200.0;
 
     public boolean insertarCooperacion(Cooperacion cooperacion) {
-        String sql = "INSERT INTO cooperaciones (anio, banda, castillo, paseo, cooperacion_extra, " +
-                    "fecha_registro, descuento, total_pagado, tipo_pago, id_ciudadano) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO cooperaciones (anio, banda, castillo, paseo, cooperacion_extra, concepto_extra, " + // ← Agregado concepto_extra
+                "fecha_registro, descuento, total_pagado, tipo_pago, id_ciudadano) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // ← Un parámetro más
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, cooperacion.getAnio());
-            pstmt.setDouble(2, cooperacion.getBanda());
-            pstmt.setDouble(3, cooperacion.getCastillo());
-            pstmt.setDouble(4, cooperacion.getPaseo());
-            pstmt.setInt(5, cooperacion.getCooperacionExtra());
-            pstmt.setDate(6, Date.valueOf(cooperacion.getFechaRegistro()));
-            pstmt.setString(7, cooperacion.getDescuento());
-            pstmt.setDouble(8, cooperacion.getTotalPagado());
-            pstmt.setString(9, cooperacion.getTipoPago());
-            pstmt.setInt(10, cooperacion.getIdCiudadano());
-            
-            int resultado = pstmt.executeUpdate();
-            System.out.println("✅ Cooperación insertada correctamente. Filas afectadas: " + resultado);
-            return resultado > 0;
-            
-        } catch (SQLException e) {
-            System.err.println("❌ Error al insertar cooperación: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
+        pstmt.setInt(1, cooperacion.getAnio());
+        pstmt.setDouble(2, cooperacion.getBanda());
+        pstmt.setDouble(3, cooperacion.getCastillo());
+        pstmt.setDouble(4, cooperacion.getPaseo());
+        pstmt.setInt(5, cooperacion.getCooperacionExtra());
+        pstmt.setString(6, cooperacion.getConceptoExtra()); // ← Nuevo campo
+        pstmt.setDate(7, Date.valueOf(cooperacion.getFechaRegistro()));
+        pstmt.setString(8, cooperacion.getDescuento());
+        pstmt.setDouble(9, cooperacion.getTotalPagado());
+        pstmt.setString(10, cooperacion.getTipoPago());
+        pstmt.setInt(11, cooperacion.getIdCiudadano());
+        
+        int resultado = pstmt.executeUpdate();
+        System.out.println("✅ Cooperación insertada correctamente. Filas afectadas: " + resultado);
+        return resultado > 0;
+        
+    } catch (SQLException e) {
+        System.err.println("❌ Error al insertar cooperación: " + e.getMessage());
+        e.printStackTrace();
+        return false;
     }
+}
+
 
     // Método para contar cooperaciones por tipo y año
     public int contarCooperacionesPorTipo(int idCiudadano, int anio, String tipo) {
@@ -191,6 +193,7 @@ public class CooperacionDAO {
         cooperacion.setCastillo(rs.getDouble("castillo"));
         cooperacion.setPaseo(rs.getDouble("paseo"));
         cooperacion.setCooperacionExtra(rs.getInt("cooperacion_extra"));
+        cooperacion.setConceptoExtra(rs.getString("concepto_extra")); 
         
         Date fecha = rs.getDate("fecha_registro");
         if (fecha != null) {

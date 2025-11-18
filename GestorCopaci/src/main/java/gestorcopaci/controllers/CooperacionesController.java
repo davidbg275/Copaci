@@ -20,6 +20,7 @@ public class CooperacionesController {
     @FXML private CheckBox cbCastillo;
     @FXML private CheckBox cbPaseo;
     @FXML private TextField txtCooperacionExtra;
+    @FXML private TextField txtConceptoExtra;
     @FXML private DatePicker dpFechaRegistro;
     @FXML private Label lblDescuento;
     @FXML private Label lblTotalPagar;
@@ -54,9 +55,9 @@ public class CooperacionesController {
         
         // Listeners para recalcular total
         cbBanda.selectedProperty().addListener((observable, oldValue, newValue) -> calcularTotal());
-        cbCastillo.selectedProperty().addListener((observable, oldValue, newValue) -> calcularTotal());
-        cbPaseo.selectedProperty().addListener((observable, oldValue, newValue) -> calcularTotal());
-        txtCooperacionExtra.textProperty().addListener((observable, oldValue, newValue) -> calcularTotal());
+    cbCastillo.selectedProperty().addListener((observable, oldValue, newValue) -> calcularTotal());
+    cbPaseo.selectedProperty().addListener((observable, oldValue, newValue) -> calcularTotal());
+    txtCooperacionExtra.textProperty().addListener((observable, oldValue, newValue) -> calcularTotal());
         
         // Listener para año
         txtAnio.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -180,7 +181,7 @@ public class CooperacionesController {
     }
 }
 
-    private void guardarCooperacion() {
+   private void guardarCooperacion() {
     if (!validarCampos()) {
         return;
     }
@@ -204,9 +205,9 @@ public class CooperacionesController {
         
         String tipoCiudadano = cooperacionDAO.obtenerTipoCiudadano(idCiudadano);
         
-        int extra = 0; // ← Cambiado a int
+        int extra = 0;
         if (!txtCooperacionExtra.getText().trim().isEmpty()) {
-            extra = Integer.parseInt(txtCooperacionExtra.getText().trim()); // ← Cambiado a parseInt
+            extra = Integer.parseInt(txtCooperacionExtra.getText().trim());
         }
         
         double total = cooperacionDAO.calcularTotalConDescuento(
@@ -214,15 +215,17 @@ public class CooperacionesController {
             cbBanda.isSelected(),
             cbCastillo.isSelected(),
             cbPaseo.isSelected(),
-            extra // ← Ya es int, pero el método espera double (funciona por conversión automática)
+            extra
         );
         
+        // CORRECCIÓN: Agregar el parámetro conceptoExtra
         Cooperacion cooperacion = new Cooperacion(
             anio,
             cbBanda.isSelected() ? 400.0 : 0.0,
             cbCastillo.isSelected() ? 400.0 : 0.0,
             cbPaseo.isSelected() ? 200.0 : 0.0,
-            extra, // ← Cambiado a int
+            extra,
+            txtConceptoExtra.getText().trim(), // ← ESTE ES EL PARÁMETRO QUE FALTABA
             dpFechaRegistro.getValue(),
             ("Estudiante".equals(tipoCiudadano) || "Madre Soltera".equals(tipoCiudadano)) ? "50%" : "0%",
             total,
@@ -231,13 +234,18 @@ public class CooperacionesController {
         );
 
         if (cooperacionDAO.insertarCooperacion(cooperacion)) {
-            mostrarAlerta("✅ Éxito", 
-                "Cooperación registrada correctamente\n\n" +
-                "📋 Detalles:\n" +
-                "• Total pagado: $" + String.format("%,.2f", total) + "\n" +
-                "• Año: " + anio + "\n" +
-                "• Tipo de pago: " + cbTipoPago.getValue(),
-                Alert.AlertType.INFORMATION);
+            String mensaje = "Cooperación registrada correctamente\n\n" +
+                    "📋 Detalles:\n" +
+                    "• Total pagado: $" + String.format("%,.2f", total) + "\n" +
+                    "• Año: " + anio + "\n" +
+                    "• Tipo de pago: " + cbTipoPago.getValue();
+            
+            // Agregar concepto extra al mensaje si existe
+            if (!txtConceptoExtra.getText().trim().isEmpty()) {
+                mensaje += "\n• Concepto extra: " + txtConceptoExtra.getText().trim();
+            }
+            
+            mostrarAlerta("✅ Éxito", mensaje, Alert.AlertType.INFORMATION);
             limpiarCampos();
             actualizarResumenCooperaciones();
         } else {
@@ -250,6 +258,7 @@ public class CooperacionesController {
         mostrarAlerta("❌ Error", "Error al registrar cooperación: " + e.getMessage(), Alert.AlertType.ERROR);
     }
 }
+
 
     private boolean validarCampos() {
         // Validar ID Ciudadano
@@ -328,16 +337,17 @@ public class CooperacionesController {
     }
 
     private void limpiarCampos() {
-        // No limpiar ID y Año para facilitar registro múltiple
-        cbBanda.setSelected(false);
-        cbCastillo.setSelected(false);
-        cbPaseo.setSelected(false);
-        txtCooperacionExtra.clear();
-        dpFechaRegistro.setValue(LocalDate.now());
-        cbTipoPago.setValue(null);
-        calcularTotal();
-        actualizarResumenCooperaciones();
-    }
+    // No limpiar ID y Año para facilitar registro múltiple
+    cbBanda.setSelected(false);
+    cbCastillo.setSelected(false);
+    cbPaseo.setSelected(false);
+    txtCooperacionExtra.clear();
+    txtConceptoExtra.clear(); // ← Limpiar nuevo campo
+    dpFechaRegistro.setValue(LocalDate.now());
+    cbTipoPago.setValue(null);
+    calcularTotal();
+    actualizarResumenCooperaciones();
+}
 
     private void cerrarVentana() {
         Stage stage = (Stage) btnCancelar.getScene().getWindow();

@@ -87,11 +87,18 @@
                     <!-- Cooperación extra -->
                     <VBox spacing="10" alignment="CENTER">
                         <Label text="Cooperación Extra (Opcional):" style="-fx-font-weight: bold; -fx-text-fill: #555; -fx-font-size: 14px;"/>
-                        <HBox spacing="10" alignment="CENTER">
-                            <Label text="Monto adicional:" style="-fx-text-fill: #666;"/>
-                            <TextField fx:id="txtCooperacionExtra" promptText="0.00" 
-                                     style="-fx-pref-width: 120; -fx-pref-height: 35; -fx-background-radius: 4; -fx-border-radius: 4;"/>
-                        </HBox>
+                        <VBox spacing="8" alignment="CENTER">
+                            <HBox spacing="10" alignment="CENTER">
+                                <Label text="Monto:" style="-fx-text-fill: #666;"/>
+                                <TextField fx:id="txtCooperacionExtra" promptText="0" 
+                                         style="-fx-pref-width: 100; -fx-pref-height: 35; -fx-background-radius: 4; -fx-border-radius: 4;"/>
+                            </HBox>
+                            <HBox spacing="10" alignment="CENTER">
+                                <Label text="Concepto:" style="-fx-text-fill: #666;"/>
+                                <TextField fx:id="txtConceptoExtra" promptText="Ej: Donación especial, Fondo emergente..." 
+                                         style="-fx-pref-width: 300; -fx-pref-height: 35; -fx-background-radius: 4; -fx-border-radius: 4;"/>
+                            </HBox>
+                        </VBox>
                     </VBox>
                 </VBox>
             </VBox>

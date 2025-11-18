@@ -13,6 +13,7 @@ public class Cooperacion {
     private double castillo;
     private double paseo;
     private int cooperacionExtra;
+    private String conceptoExtra;
     private LocalDate fechaRegistro;
     private String descuento;
     private double totalPagado;
@@ -23,19 +24,20 @@ public class Cooperacion {
     public Cooperacion() {}
 
     public Cooperacion(int anio, double banda, double castillo, double paseo, 
-                      int cooperacionExtra, LocalDate fechaRegistro, String descuento,
-                      double totalPagado, String tipoPago, int idCiudadano) {
-        this.anio = anio;
-        this.banda = banda;
-        this.castillo = castillo;
-        this.paseo = paseo;
-        this.cooperacionExtra = cooperacionExtra;
-        this.fechaRegistro = fechaRegistro;
-        this.descuento = descuento;
-        this.totalPagado = totalPagado;
-        this.tipoPago = tipoPago;
-        this.idCiudadano = idCiudadano;
-    }
+                  int cooperacionExtra, String conceptoExtra, LocalDate fechaRegistro,
+                  String descuento, double totalPagado, String tipoPago, int idCiudadano) {
+    this.anio = anio;
+    this.banda = banda;
+    this.castillo = castillo;
+    this.paseo = paseo;
+    this.cooperacionExtra = cooperacionExtra;
+    this.conceptoExtra = conceptoExtra; // ← Este es el nuevo parámetro
+    this.fechaRegistro = fechaRegistro;
+    this.descuento = descuento;
+    this.totalPagado = totalPagado;
+    this.tipoPago = tipoPago;
+    this.idCiudadano = idCiudadano;
+}
 
     // Getters y Setters
     public int getIdCooperation() { return idCooperation; }
@@ -55,6 +57,9 @@ public class Cooperacion {
 
     public int getCooperacionExtra() { return cooperacionExtra; }
     public void setCooperacionExtra(int cooperacionExtra) { this.cooperacionExtra = cooperacionExtra; }
+    
+    public String getConceptoExtra() { return conceptoExtra; }
+    public void setConceptoExtra(String conceptoExtra) { this.conceptoExtra = conceptoExtra; }
 
     public LocalDate getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(LocalDate fechaRegistro) { this.fechaRegistro = fechaRegistro; }
