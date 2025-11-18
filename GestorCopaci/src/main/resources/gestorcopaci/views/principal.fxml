@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="gestorcopaci.controllers.PrincipalController">
+
+    <!-- Top: logo + título -->
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 15;">
+            <ImageView fx:id="imgLogo" fitHeight="80" fitWidth="80"/>
+            <Label fx:id="lblTitulo"
+                   text="Bienvenido al Sistema Copaci"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+
+    <!-- Left: menú -->
+    <left>
+        <VBox spacing="10" style="-fx-padding: 15;">
+            <Button text="Dashboard"        onAction="#onDashboard"/>
+            <Button text="Registro"         onAction="#onRegistro"/>
+            <Button text="Faenas"           onAction="#onFaenas"/>
+            <Button text="Cooperaciones"    onAction="#onCooperaciones"/>
+            <Button text="Donaciones"       onAction="#onDonaciones"/>
+            <Button text="Asistencia"       onAction="#onBitacora"/>
+            <Button text="Usuarios"         onAction="#onUsuarios"/>
+            <Button text="Cerrar sesión"    onAction="#onCerrarSesion"/>
+        </VBox>
+    </left>
+
+    <!-- Center: contenido placeholder -->
+    <center>
+        <Label fx:id="lblContenido"
+               text="Selecciona un módulo del menú"
+               style="-fx-font-size: 18px;"
+               BorderPane.alignment="CENTER"/>
+    </center>
+</BorderPane>
