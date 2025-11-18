@@ -8,25 +8,20 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="gestorcopaci.controllers.LoginController"
       spacing="15" alignment="CENTER">
-    <padding>
-        <Insets top="20" right="30" bottom="20" left="30"/>
-    </padding>
-
-    <Label text="COPACI" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-
-    <Label text="Bienvenido al Sistema Copaci"
-           style="-fx-font-size: 16px;"/>
-
-    <GridPane hgap="10" vgap="10">
-        <Label text="Usuario:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="txtUsuario" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-        <Label text="Contraseña:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <PasswordField fx:id="txtPassword" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-    </GridPane>
-
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Ingresar" onAction="#onIngresar"/>
-        <Button text="Salir" onAction="#onSalir"/>
-    </HBox>
+  <padding>
+    <Insets top="20" right="30" bottom="20" left="30"/>
+  </padding>
+  <Label text="COPACI" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+  <Label text="Bienvenido al Sistema Copaci"
+                     style="-fx-font-size: 16px;"/>
+  <GridPane hgap="10" vgap="10">
+    <Label text="Usuario:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <TextField fx:id="txtUsuario" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Contraseña:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <PasswordField fx:id="txtPassword" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+  </GridPane>
+  <HBox spacing="10" alignment="CENTER">
+    <Button text="Ingresar" onAction="#onIngresar"/>
+    <Button text="Salir" onAction="#onSalir"/>
+  </HBox>
 </VBox>
