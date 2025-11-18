@@ -2,15 +2,15 @@ package gestorcopaci.controllers;
 
 import gestorcopaci.App;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -41,9 +41,35 @@ public class PrincipalController implements Initializable {
 
     @FXML
     private void onRegistro() {
-        lblTitulo.setText("Módulo de Registro");
-        lblContenido.setText("Aquí irá el formulario de ciudadanos / registro.");
-        info("Registro", "Redirigiendo a: Módulo de Registro (por implementar)");
+        try {
+            // Cargar la interfaz de registro de ciudadanos
+            FXMLLoader loader = new FXMLLoader(
+                    App.class.getResource("views/registro_ciudadanos.fxml")
+            );
+            Parent root = loader.load();
+            
+            // Crear nueva ventana
+            Stage stage = new Stage();
+            stage.setTitle("Registro de Ciudadanos - Sistema Copaci");
+            stage.setScene(new Scene(root));
+            stage.setResizable(true);
+            
+            // Configurar para que se cierre correctamente
+            stage.setOnCloseRequest(event -> {
+                lblTitulo.setText("Bienvenido al Sistema Copaci");
+                lblContenido.setText("Registro de ciudadanos cerrado");
+            });
+            
+            stage.show();
+            
+            // Actualizar la interfaz principal
+            lblTitulo.setText("Módulo de Registro - Ciudadanos");
+            lblContenido.setText("Ventana de registro de ciudadanos abierta. Puede minimizar esta ventana para acceder al formulario.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            error("Error", "No se pudo abrir el módulo de registro:\n" + e.getMessage());
+        }
     }
 
     @FXML
