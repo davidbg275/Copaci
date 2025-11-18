@@ -80,18 +80,54 @@ public class PrincipalController implements Initializable {
     }
 
     @FXML
-    private void onCooperaciones() {
+private void onCooperaciones() {
+    try {
+        FXMLLoader loader = new FXMLLoader(
+                App.class.getResource("views/cooperaciones.fxml")
+        );
+        Parent root = loader.load();
+        
+        Stage stage = new Stage();
+        stage.setTitle("Registro de Cooperaciones - Sistema Copaci");
+        stage.setScene(new Scene(root));
+        stage.setResizable(false);
+        
+        stage.show();
+        
+        // Actualizar la interfaz principal
         lblTitulo.setText("Módulo de Cooperaciones");
-        lblContenido.setText("Aquí irá el manejo de cooperaciones.");
-        info("Cooperaciones", "Redirigiendo a: Módulo de Cooperaciones (por implementar)");
+        lblContenido.setText("Ventana de registro de cooperaciones abierta.");
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        error("Error", "No se pudo abrir el módulo de cooperaciones:\n" + e.getMessage());
     }
+}
 
     @FXML
-    private void onDonaciones() {
+private void onDonaciones() {
+    try {
+        FXMLLoader loader = new FXMLLoader(
+                App.class.getResource("views/donaciones.fxml")
+        );
+        Parent root = loader.load();
+        
+        Stage stage = new Stage();
+        stage.setTitle("Registro de Donaciones - Sistema Copaci");
+        stage.setScene(new Scene(root));
+        stage.setResizable(false);
+        
+        stage.show();
+        
+        // Actualizar la interfaz principal
         lblTitulo.setText("Módulo de Donaciones");
-        lblContenido.setText("Aquí irá el manejo de donaciones.");
-        info("Donaciones", "Redirigiendo a: Módulo de Donaciones (por implementar)");
+        lblContenido.setText("Ventana de registro de donaciones abierta.");
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        error("Error", "No se pudo abrir el módulo de donaciones:\n" + e.getMessage());
     }
+}
 
     @FXML
     private void onBitacora() {
