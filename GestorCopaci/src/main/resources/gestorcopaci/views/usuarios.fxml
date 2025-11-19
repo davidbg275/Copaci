@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gestorcopaci.controllers.UsuariosController"
+      spacing="0"
+      style="-fx-background-color: #f8f9fa;"
+      prefWidth="1000" prefHeight="650">
+
+    <children>
+
+        <!-- HEADER -->
+        <HBox spacing="10" alignment="CENTER_LEFT"
+              style="-fx-padding: 15; -fx-background-color: #1976D2;">
+            <children>
+                <Label text="Módulo de Usuarios / Expedientes"
+                       style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Label text=" | Consulta de ciudadanos y faenas"
+                       style="-fx-text-fill: #e3f2fd; -fx-font-size: 14px;"/>
+            </children>
+        </HBox>
+
+        <!-- CONTENIDO -->
+        <HBox spacing="15" VBox.vgrow="ALWAYS"
+              style="-fx-padding: 15;">
+            <children>
+
+                <!-- PANEL IZQUIERDO: BUSCADOR + TABLA CIUDADANOS -->
+                <VBox spacing="10" prefWidth="350"
+                      style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-radius: 6; -fx-background-radius: 6;">
+                    <children>
+                        <Label text="Buscar ciudadano"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+
+                        <TextField fx:id="txtBuscar"
+                                   promptText="Escribe el nombre (coincidencias parciales)"/>
+
+                        <TableView fx:id="tblCiudadanos" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                                <TableColumn fx:id="colNombre" text="Nombre" prefWidth="180"/>
+                                <TableColumn fx:id="colManzana" text="Mz" prefWidth="50"/>
+                                <TableColumn fx:id="colTipo" text="Tipo" prefWidth="100"/>
+                            </columns>
+                        </TableView>
+
+                        <Label text="* Escribe parte del nombre para filtrar."
+                               style="-fx-text-fill: #757575; -fx-font-size: 11px;"/>
+                    </children>
+                </VBox>
+
+                <!-- PANEL DERECHO: EXPEDIENTE -->
+                <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS"
+                            style="-fx-background-color: transparent;">
+                    <content>
+                        <VBox spacing="15"
+                              style="-fx-padding: 10;">
+                            <children>
+
+                                <!-- SUBTITULO -->
+                                <Label text="Expediente del ciudadano"
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+
+                                <!-- DATOS PERSONALES (como la cabecera de la hoja) -->
+                                <VBox spacing="10"
+                                      style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                    <children>
+                                        <Label text="Datos personales"
+                                               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+                                        <Separator/>
+
+                                        <GridPane hgap="10" vgap="6">
+                                            <columnConstraints>
+                                                <ColumnConstraints percentWidth="20"/>
+                                                <ColumnConstraints percentWidth="30"/>
+                                                <ColumnConstraints percentWidth="20"/>
+                                                <ColumnConstraints percentWidth="30"/>
+                                            </columnConstraints>
+
+                                            <children>
+                                                <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblId" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                                       style="-fx-font-weight: bold;"/>
+
+                                                <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                                <Label fx:id="lblNombre" GridPane.rowIndex="0" GridPane.columnIndex="3"
+                                                       style="-fx-font-weight: bold;"/>
+
+                                                <Label text="Fecha nac.:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblFechaNac" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                                <Label text="Edad (aprox):" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                                <Label fx:id="lblEdad" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                                <Label text="Domicilio:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblDomicilio" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                                       GridPane.columnSpan="3"/>
+
+                                                <Label text="Manzana:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblManzana" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                                <Label text="Estado civil:" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+                                                <Label fx:id="lblEstadoCivil" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+
+                                                <Label text="Ocupación:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblOcupacion" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                                <Label text="Tipo ciudadano:" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+                                                <Label fx:id="lblTipoCiudadano" GridPane.rowIndex="4" GridPane.columnIndex="3"/>
+
+                                                <Label text="Fecha alta:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblFechaAlta" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                                                <Label text="Certificado:" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+                                                <Label fx:id="lblCertificado" GridPane.rowIndex="5" GridPane.columnIndex="3"/>
+
+                                                <Label text="Lugar nacimiento:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblLugarNacimiento" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                                                <Label text="Grado estudios:" GridPane.rowIndex="6" GridPane.columnIndex="2"/>
+                                                <Label fx:id="lblGradoEstudios" GridPane.rowIndex="6" GridPane.columnIndex="3"/>
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </VBox>
+
+                                <!-- FAENAS -->
+                                <VBox spacing="10"
+                                      style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                    <children>
+                                        <Label text="Faenas (historial completo)"
+                                               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+                                        <Separator/>
+                                        <TableView fx:id="tblFaenas" prefHeight="180">
+                                            <columns>
+                                                <TableColumn fx:id="colFaenaAnio" text="Año" prefWidth="60"/>
+                                                <TableColumn fx:id="colFaenaMes" text="Mes" prefWidth="80"/>
+                                                <TableColumn fx:id="colFaenaAsistencia" text="Asistencia" prefWidth="90"/>
+                                                <TableColumn fx:id="colFaenaPago" text="Pago reposición" prefWidth="120"/>
+                                                <TableColumn fx:id="colFaenaFecha" text="Fecha registro" prefWidth="120"/>
+                                            </columns>
+                                        </TableView>
+                                        <Label fx:id="lblResumenFaenas"
+                                               style="-fx-font-size: 11px; -fx-text-fill: #757575;"/>
+                                    </children>
+                                </VBox>
+
+                                <!-- COOPERACIONES -->
+                                <VBox spacing="10"
+                                      style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                    <children>
+                                        <Label text="Cooperaciones"
+                                               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+                                        <Separator/>
+                                        <TableView fx:id="tblCooperaciones" prefHeight="160">
+                                            <columns>
+                                                <TableColumn fx:id="colCoopAnio" text="Año" prefWidth="60"/>
+                                                <TableColumn fx:id="colCoopTipo" text="Tipo" prefWidth="140"/>
+                                                <TableColumn fx:id="colCoopTotal" text="Total pagado" prefWidth="100"/>
+                                                <TableColumn fx:id="colCoopFecha" text="Fecha registro" prefWidth="120"/>
+                                            </columns>
+                                        </TableView>
+                                        <Label fx:id="lblResumenCoops"
+                                               style="-fx-font-size: 11px; -fx-text-fill: #757575;"/>
+                                    </children>
+                                </VBox>
+
+                                <!-- VOCAL / ASISTENCIAS -->
+                                <VBox spacing="10"
+                                      style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                    <children>
+                                        <Label text="Vocal / Asambleas"
+                                               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+                                        <Separator/>
+
+                                        <GridPane hgap="10" vgap="6">
+                                            <columnConstraints>
+                                                <ColumnConstraints percentWidth="30"/>
+                                                <ColumnConstraints percentWidth="70"/>
+                                            </columnConstraints>
+                                            <children>
+                                                <Label text="Estado vocal:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblEstadoVocal" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                                <Label text="Periodo:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblPeriodoVocal" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                                <Label text="Eventos asistidos:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblEventosAsistidos" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                                <Label text=" Asistencia:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblPorcentajeAsistencia" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                            </children>
+                                        </GridPane>
+
+                                        <Label fx:id="lblMensajeVocal"
+                                               style="-fx-font-size: 12px; -fx-text-fill: #388E3C; -fx-font-weight: bold;"/>
+                                    </children>
+                                </VBox>
+
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+            </children>
+        </HBox>
+
+    </children>
+</VBox>

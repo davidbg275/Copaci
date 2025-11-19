@@ -4,12 +4,16 @@
  */
 package gestorcopaci.daos;
 
-import gestorcopaci.models.Cooperacion;
-import gestorcopaci.utils.DatabaseConnection;
-import java.sql.*;
-import java.time.LocalDate;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import gestorcopaci.models.Cooperacion;
+import gestorcopaci.utils.DatabaseConnection;
 
 public class CooperacionDAO {
 
@@ -187,7 +191,7 @@ public class CooperacionDAO {
 
     private Cooperacion crearCooperacionDesdeResultSet(ResultSet rs) throws SQLException {
         Cooperacion cooperacion = new Cooperacion();
-        cooperacion.setIdCooperation(rs.getInt("id_cooperation"));
+        cooperacion.setIdCooperation(rs.getInt("id_cooperacion"));
         cooperacion.setAnio(rs.getInt("anio"));
         cooperacion.setBanda(rs.getDouble("banda"));
         cooperacion.setCastillo(rs.getDouble("castillo"));

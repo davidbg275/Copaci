@@ -1,37 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package gestorcopaci.daos;
-
-/**
- *
- * @author manue
- */
 
 import gestorcopaci.models.Vocal;
 import gestorcopaci.utils.DatabaseConnection;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VocalDAO {
-    private Connection connection;
-    
+
     public VocalDAO() {
-        this.connection = DatabaseConnection.getConnection();
+        // No guardamos la conexión en un campo para evitar usar conexiones cerradas
     }
-    
-    // Agrega este método para obtener el nombre del ciudadano
+
+    /**
+     * Obtiene el nombre del ciudadano por id.
+     */
     public String obtenerNombreCiudadano(int idCiudadano) {
         String sql = "SELECT nombre FROM ciudadanos WHERE id_ciudadano = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, idCiudadano);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getString("nombre");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("nombre");
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error al obtener nombre del ciudadano: " + e.getMessage());
@@ -39,12 +34,17 @@ public class VocalDAO {
         return "Ciudadano ID: " + idCiudadano;
     }
 
+    /**
+     * Indica si el ciudadano es vocal activo.
+     */
     public boolean esVocalActivo(int idCiudadano) {
         String sql = "SELECT 1 FROM vocales " +
-                     "WHERE id_ciudadano = ? AND estado = 'activo' " +
-                     "LIMIT 1";
+                "WHERE id_ciudadano = ? AND estado = 'activo' " +
+                "LIMIT 1";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, idCiudadano);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next(); // hay al menos un registro activo
@@ -54,46 +54,60 @@ public class VocalDAO {
             return false;
         }
     }
-    
-    
-    // ... (tus otros métodos existentes)
-    
+
+    /**
+     * Asigna un vocal con mandato de 1 año a partir de hoy.
+     */
     public boolean asignarVocal(int idCiudadano) {
-        String sql = "INSERT INTO vocales (id_ciudadano, fecha_inicio_mandato, fecha_fin_mandato) VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String sql = "INSERT INTO vocales " +
+                "(id_ciudadano, fecha_inicio_mandato, fecha_fin_mandato) " +
+                "VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, idCiudadano);
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
+
         } catch (SQLException e) {
             System.err.println("Error al asignar vocal: " + e.getMessage());
             return false;
         }
     }
-    
+
+    /**
+     * Obtiene el registro de vocal para un ciudadano (si existe).
+     */
     public Vocal obtenerVocalPorCiudadano(int idCiudadano) {
         String sql = "SELECT * FROM vocales WHERE id_ciudadano = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, idCiudadano);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return mapResultSetToVocal(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToVocal(rs);
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error al obtener vocal: " + e.getMessage());
         }
         return null;
     }
-    
+
+    /**
+     * Lista de vocales con estado 'activo'.
+     */
     public List<Vocal> obtenerVocalesActivos() {
         List<Vocal> vocales = new ArrayList<>();
         String sql = "SELECT * FROM vocales WHERE estado = 'activo'";
-        
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
                 vocales.add(mapResultSetToVocal(rs));
             }
@@ -102,14 +116,18 @@ public class VocalDAO {
         }
         return vocales;
     }
-    
+
+    /**
+     * Lista de todos los vocales (ordenados por created_at desc).
+     */
     public List<Vocal> obtenerTodosVocales() {
         List<Vocal> vocales = new ArrayList<>();
         String sql = "SELECT * FROM vocales ORDER BY created_at DESC";
-        
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
                 vocales.add(mapResultSetToVocal(rs));
             }
@@ -118,35 +136,44 @@ public class VocalDAO {
         }
         return vocales;
     }
-    
+
+    /**
+     * Recalcula eventos_asistidos, porcentaje_asistencia y estado de un vocal.
+     */
     public boolean actualizarEstadisticasVocal(int idVocal) {
         String sql = "UPDATE vocales SET " +
-                     "eventos_asistidos = (SELECT COUNT(*) FROM asistencias WHERE id_vocal = ?), " +
-                     "porcentaje_asistencia = (SELECT (COUNT(*) * 100.0 / 10) FROM asistencias WHERE id_vocal = ?), " +
-                     "estado = CASE " +
-                     "    WHEN (SELECT COUNT(*) FROM asistencias WHERE id_vocal = ?) >= 10 " +
-                     "    AND (SELECT (COUNT(*) * 100.0 / 10) FROM asistencias WHERE id_vocal = ?) > 90 " +
-                     "    THEN 'completado' " +
-                     "    WHEN fecha_fin_mandato < CURDATE() THEN 'incompleto' " +
-                     "    ELSE 'activo' " +
-                     "END " +
-                     "WHERE id_vocal = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                "  eventos_asistidos = (SELECT COUNT(*) FROM asistencias WHERE id_vocal = ?), " +
+                "  porcentaje_asistencia = (SELECT (COUNT(*) * 100.0 / 10) FROM asistencias WHERE id_vocal = ?), " +
+                "  estado = CASE " +
+                "      WHEN (SELECT COUNT(*) FROM asistencias WHERE id_vocal = ?) >= 10 " +
+                "       AND (SELECT (COUNT(*) * 100.0 / 10) FROM asistencias WHERE id_vocal = ?) > 90 " +
+                "           THEN 'completado' " +
+                "      WHEN fecha_fin_mandato < CURDATE() THEN 'incompleto' " +
+                "      ELSE 'activo' " +
+                "  END " +
+                "WHERE id_vocal = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, idVocal);
             stmt.setInt(2, idVocal);
             stmt.setInt(3, idVocal);
             stmt.setInt(4, idVocal);
             stmt.setInt(5, idVocal);
-            
+
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
+
         } catch (SQLException e) {
             System.err.println("Error al actualizar estadísticas: " + e.getMessage());
             return false;
         }
     }
-    
+
+    /**
+     * Mapea un ResultSet a objeto Vocal.
+     */
     private Vocal mapResultSetToVocal(ResultSet rs) throws SQLException {
         Vocal vocal = new Vocal();
         vocal.setIdVocal(rs.getInt("id_vocal"));
