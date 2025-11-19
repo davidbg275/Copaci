@@ -1,124 +1,217 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="gestorcopaci.controllers.FaenasController"
-      spacing="10"
-      prefWidth="800" prefHeight="600">
+      spacing="0"
+      style="-fx-background-color: #f8f9fa;"
+      prefWidth="900" prefHeight="650">
 
     <children>
 
-        <!-- Título -->
-        <Label text="Registro de Faenas"
-               style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-
-        <Separator/>
-
-        <!-- DATOS CIUDADANO -->
-        <VBox spacing="5">
+        <!-- HEADER -->
+        <VBox style="-fx-background-color: linear-gradient(to right, #1976D2, #2196F3); -fx-padding: 20;">
             <children>
-                <Label text="Datos del ciudadano"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-                <GridPane hgap="10" vgap="8">
-                    <children>
-                        <!-- ID -->
-                        <Label text="ID Ciudadano:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <TextField fx:id="txtIdCiudadano"
-                                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                        <!-- Nombre -->
-                        <Label text="Nombre:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="lblNombreCiudadano"
-                               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                        <!-- Tipo -->
-                        <Label text="Tipo de ciudadano:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <Label fx:id="lblTipoCiudadano"
-                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                    </children>
-                </GridPane>
+                <Label text="Registro de Faenas"
+                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Label text="Control mensual de faenas, descuentos y adeudos"
+                       style="-fx-text-fill: #E3F2FD; -fx-font-size: 14px;"/>
             </children>
         </VBox>
 
-        <Separator/>
+        <!-- CONTENIDO -->
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <content>
+                <VBox spacing="20" style="-fx-padding: 20;">
 
-        <!-- DATOS FAENA -->
-        <VBox spacing="5">
-            <children>
-                <Label text="Datos de la faena"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <!-- 1. CIUDADANO -->
+                    <VBox spacing="10">
+                        <children>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <children>
+                                    <Label text="1."
+                                           style="-fx-text-fill: #1976D2; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Datos del ciudadano"
+                                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                                </children>
+                            </HBox>
+                            <Separator/>
 
-                <GridPane hgap="10" vgap="8">
-                    <children>
-                        <!-- Año -->
-                        <Label text="Año:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <ComboBox fx:id="cbAnio"
-                                  GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                            <GridPane hgap="20" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints halignment="RIGHT" percentWidth="30"/>
+                                    <ColumnConstraints percentWidth="70"/>
+                                </columnConstraints>
+                                <children>
+                                    <Label text="ID Ciudadano:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="txtIdCiudadano" promptText="Ej. 1"
+                                               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                        <!-- Mes -->
-                        <Label text="Mes:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <ComboBox fx:id="cbMes"
-                                  GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                    <Label text="Nombre:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblNombreCiudadano"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                           style="-fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
 
-                        <!-- Asistencia -->
-                        <Label text="Asistencia:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <CheckBox fx:id="chkAsistencia" text="Asistió a la faena"
-                                  GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                    <Label text="Tipo de ciudadano:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblTipoCiudadano"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                           style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+                                </children>
+                            </GridPane>
+                        </children>
+                    </VBox>
 
-                        <!-- Fecha -->
-                        <Label text="Fecha de registro:"
-                               GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <DatePicker fx:id="dpFechaRegistro"
-                                    GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    <!-- 2. REGISTRO DE FAENA -->
+                    <VBox spacing="10">
+                        <children>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <children>
+                                    <Label text="2."
+                                           style="-fx-text-fill: #1976D2; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Registro de faena individual"
+                                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                                </children>
+                            </HBox>
+                            <Separator/>
 
-                        <!-- Pago reposición -->
-                        <Label text="Pago por reposición:"
-                               GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                        <Label fx:id="lblPagoReposicion"
-                               text="0.00"
-                               GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-                    </children>
-                </GridPane>
-            </children>
-        </VBox>
+                            <GridPane hgap="20" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints halignment="RIGHT" percentWidth="30"/>
+                                    <ColumnConstraints percentWidth="70"/>
+                                </columnConstraints>
+                                <children>
+                                    <Label text="Año:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <ComboBox fx:id="cbAnio"
+                                              GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-        <Separator/>
+                                    <Label text="Mes:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <ComboBox fx:id="cbMes"
+                                              GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <!-- TABLA -->
-        <VBox spacing="5">
-            <children>
-                <Label text="Faenas registradas en el año"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Asistencia:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <CheckBox fx:id="chkAsistencia" text="Asistió a la faena"
+                                              GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                              selected="true"/>
 
-                <TableView fx:id="tablaFaenas" prefHeight="250">
-                    <columns>
-                        <TableColumn fx:id="colAnio" text="Año" prefWidth="70"/>
-                        <TableColumn fx:id="colMes" text="Mes" prefWidth="120"/>
-                        <TableColumn fx:id="colAsistencia" text="Asistencia" prefWidth="120"/>
-                        <TableColumn fx:id="colPago" text="Pago reposición" prefWidth="140"/>
-                        <TableColumn fx:id="colFecha" text="Fecha registro" prefWidth="140"/>
-                    </columns>
-                </TableView>
-            </children>
-        </VBox>
+                                    <Label text="Fecha de registro:"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                    <DatePicker fx:id="dpFechaRegistro"
+                                                GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <!-- BOTONES -->
-        <HBox spacing="15">
-            <children>
-                <Button fx:id="btnGuardar" text="Registrar faena"
-                        onAction="#onGuardar"/>
-                <Button fx:id="btnLimpiar" text="Limpiar"
-                        onAction="#onLimpiar"/>
-                <Button fx:id="btnCancelar" text="Cancelar"
-                        onAction="#onCancelar"/>
-            </children>
-        </HBox>
+                                    <Label text="Pago por reposición:"
+                                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblPagoReposicion"
+                                           text="0.00"
+                                           GridPane.rowIndex="4" GridPane.columnIndex="1"
+                                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+                                </children>
+                            </GridPane>
+                        </children>
+                    </VBox>
+
+                    <!-- 3. ADEUDOS -->
+                    <VBox spacing="10">
+                        <children>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <children>
+                                    <Label text="3."
+                                           style="-fx-text-fill: #1976D2; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Adeudos de faenas"
+                                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                                </children>
+                            </HBox>
+                            <Label text="Se calculan desde que el ciudadano cumple 18 años, una faena por mes."
+                                   style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                            <Separator/>
+
+                            <HBox spacing="20" alignment="TOP_LEFT">
+                                <children>
+                                    <VBox spacing="5" VBox.vgrow="ALWAYS">
+                                        <children>
+                                            <Label text="Meses pendientes del año seleccionado:"
+                                                   style="-fx-font-weight: bold;"/>
+                                            <ListView fx:id="listaAdeudos" prefHeight="150"
+                                                      style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-radius: 4; -fx-padding: 5;"/>
+                                        </children>
+                                    </VBox>
+
+                                    <VBox spacing="5" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Total adeudado:"
+                                                   style="-fx-font-weight: bold;"/>
+                                            <Label fx:id="lblTotalAdeudo"
+                                                   text="0.00"
+                                                   style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #D32F2F;"/>
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <children>
+                                    <Button fx:id="btnPagarSeleccionados" text="Pagar seleccionados"
+                                            onAction="#onPagarSeleccionados"
+                                            style="-fx-background-color: #43A047; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                                    <Button fx:id="btnPagarTodos" text="Pagar todos los adeudos"
+                                            onAction="#onPagarTodos"
+                                            style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+
+                    <!-- 4. TABLA DE FAENAS -->
+                    <VBox spacing="10">
+                        <children>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <children>
+                                    <Label text="4."
+                                           style="-fx-text-fill: #1976D2; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Historial de faenas del año"
+                                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                                </children>
+                            </HBox>
+                            <Separator/>
+
+                            <TableView fx:id="tablaFaenas" prefHeight="250"
+                                       style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-radius: 4;">
+                                <columns>
+                                    <TableColumn fx:id="colAnio" text="Año" prefWidth="70"/>
+                                    <TableColumn fx:id="colMes" text="Mes" prefWidth="120"/>
+                                    <TableColumn fx:id="colAsistencia" text="Asistencia" prefWidth="120"/>
+                                    <TableColumn fx:id="colPago" text="Pago reposición" prefWidth="140"/>
+                                    <TableColumn fx:id="colFecha" text="Fecha registro" prefWidth="140"/>
+                                </columns>
+                            </TableView>
+                        </children>
+                    </VBox>
+
+                    <!-- BOTONES -->
+                    <HBox spacing="20" alignment="CENTER" style="-fx-padding: 20 0 0 0;">
+                        <children>
+                            <Button fx:id="btnGuardar" text="Registrar faena"
+                                    onAction="#onGuardar"
+                                    prefWidth="200" prefHeight="40"
+                                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                            <Button fx:id="btnLimpiar" text="Limpiar"
+                                    onAction="#onLimpiar"
+                                    prefWidth="140" prefHeight="40"
+                                    style="-fx-background-color: #78909C; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                            <Button fx:id="btnCancelar" text="Cancelar"
+                                    onAction="#onCancelar"
+                                    prefWidth="120" prefHeight="40"
+                                    style="-fx-background-color: #757575; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        </children>
+                    </HBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
 
     </children>
 </VBox>
