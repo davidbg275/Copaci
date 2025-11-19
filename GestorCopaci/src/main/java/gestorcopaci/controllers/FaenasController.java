@@ -1,19 +1,34 @@
 package gestorcopaci.controllers;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import gestorcopaci.daos.CiudadanoDAO;
 import gestorcopaci.daos.FaenaDAO;
+import gestorcopaci.daos.VocalDAO;
 import gestorcopaci.models.Ciudadano;
 import gestorcopaci.models.Faena;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class FaenasController {
 
@@ -70,12 +85,14 @@ public class FaenasController {
 
     private FaenaDAO faenaDAO;
     private CiudadanoDAO ciudadanoDAO;
+    private VocalDAO vocalDAO; // <--- nuevo
     private Ciudadano ciudadanoSeleccionado;
+
+    // ---------- CAMPOS LÓGICOS ----------
 
     private static final List<String> MESES = Arrays.asList(
             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    );
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
 
     // ---------- INITIALIZE ----------
 
@@ -83,6 +100,7 @@ public class FaenasController {
     private void initialize() {
         faenaDAO = new FaenaDAO();
         ciudadanoDAO = new CiudadanoDAO();
+        vocalDAO = new VocalDAO(); // <--- nuevo
 
         int anioActual = LocalDate.now().getYear();
 
@@ -110,16 +128,13 @@ public class FaenasController {
         if (tablaFaenas != null) {
             colAnio.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getAnio()));
             colMes.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getMes()));
-            colAsistencia.setCellValueFactory(c ->
-                    new SimpleStringProperty(c.getValue().isAsistencia() ? "Sí" : "No"));
-            colPago.setCellValueFactory(c ->
-                    new SimpleStringProperty(String.format("$ %.2f", c.getValue().getPagoReposicion())));
-            colFecha.setCellValueFactory(c ->
-                    new SimpleStringProperty(
-                            c.getValue().getFechaRegistro() != null
-                                    ? c.getValue().getFechaRegistro().toString()
-                                    : ""
-                    ));
+            colAsistencia.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isAsistencia() ? "Sí" : "No"));
+            colPago.setCellValueFactory(
+                    c -> new SimpleStringProperty(String.format("$ %.2f", c.getValue().getPagoReposicion())));
+            colFecha.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getFechaRegistro() != null
+                            ? c.getValue().getFechaRegistro().toString()
+                            : ""));
         }
 
         // Lista de adeudos: selección múltiple
@@ -145,7 +160,8 @@ public class FaenasController {
     // ---------- LÓGICA PRINCIPAL ----------
 
     private void buscarCiudadano() {
-        if (txtIdCiudadano == null) return;
+        if (txtIdCiudadano == null)
+            return;
 
         String idText = txtIdCiudadano.getText().trim();
         ciudadanoSeleccionado = null;
@@ -229,25 +245,37 @@ public class FaenasController {
 
     /**
      * Descuentos:
-     *  - Vocal: 100% desc → 0
-     *  - Estudiante / Madre Soltera: 50% desc → 50
-     *  - Normal: 100
+     * - Vocal activo: 100% desc → 0
+     * - Estudiante / Madre Soltera: 50% desc → 50
+     * - Normal: 100
      */
     private double calcularPagoReposicion(String tipoCiudadano) {
         final double BASE = 100.0;
 
+        // 1) Si el ciudadano es vocal activo, no paga faena
+        try {
+            if (ciudadanoSeleccionado != null && vocalDAO != null) {
+                boolean esVocal = vocalDAO.esVocalActivo(ciudadanoSeleccionado.getIdCiudadano());
+                if (esVocal) {
+                    return 0.0;
+                }
+            }
+        } catch (Exception ex) {
+            System.err.println("Error comprobando vocal activo: " + ex.getMessage());
+            // Si hay error, sigue con la lógica normal de tipo_ciudadano
+        }
+
+        // 2) Si no es vocal, aplicamos reglas por tipo de ciudadano
         if (tipoCiudadano == null || tipoCiudadano.isEmpty()) {
             return BASE;
         }
 
         String tipo = tipoCiudadano.toLowerCase();
 
-        if (tipo.contains("vocal")) {
-            return 0.0;
-        }
         if (tipo.contains("estudiante") || tipo.contains("madre")) {
             return BASE * 0.5;
         }
+
         return BASE;
     }
 
@@ -267,15 +295,15 @@ public class FaenasController {
 
         List<Faena> lista = faenaDAO.obtenerFaenasPorCiudadanoYAnio(
                 ciudadanoSeleccionado.getIdCiudadano(),
-                anio
-        );
+                anio);
         tablaFaenas.getItems().addAll(lista);
 
         calcularAdeudos(lista);
     }
 
     private void calcularAdeudos(List<Faena> faenasDelAnio) {
-        if (listaAdeudos == null || lblTotalAdeudo == null) return;
+        if (listaAdeudos == null || lblTotalAdeudo == null)
+            return;
 
         listaAdeudos.getItems().clear();
         lblTotalAdeudo.setText("$ 0.00");
@@ -343,12 +371,15 @@ public class FaenasController {
     }
 
     private void limpiarAdeudos() {
-        if (listaAdeudos != null) listaAdeudos.getItems().clear();
-        if (lblTotalAdeudo != null) lblTotalAdeudo.setText("$ 0.00");
+        if (listaAdeudos != null)
+            listaAdeudos.getItems().clear();
+        if (lblTotalAdeudo != null)
+            lblTotalAdeudo.setText("$ 0.00");
     }
 
     private double obtenerMontoPorMesActual() {
-        if (ciudadanoSeleccionado == null) return 0.0;
+        if (ciudadanoSeleccionado == null)
+            return 0.0;
         return calcularPagoReposicion(ciudadanoSeleccionado.getTipoCiudadano());
     }
 
@@ -360,9 +391,11 @@ public class FaenasController {
     }
 
     private MesAnio parseMesAnio(String texto) {
-        if (texto == null || texto.isBlank()) return null;
+        if (texto == null || texto.isBlank())
+            return null;
         String[] partes = texto.trim().split("\\s+");
-        if (partes.length < 2) return null;
+        if (partes.length < 2)
+            return null;
         String anioStr = partes[partes.length - 1];
         int anio;
         try {
@@ -372,7 +405,8 @@ public class FaenasController {
         }
         String nombreMes = String.join(" ",
                 Arrays.copyOf(partes, partes.length - 1));
-        if (!MESES.contains(nombreMes)) return null;
+        if (!MESES.contains(nombreMes))
+            return null;
 
         MesAnio ma = new MesAnio();
         ma.nombreMes = nombreMes;
@@ -392,7 +426,8 @@ public class FaenasController {
 
         double montoPorMes = obtenerMontoPorMesActual();
         if (montoPorMes <= 0.0) {
-            mostrarAlerta("Información", "Este tipo de ciudadano no genera adeudos (vocal u otro exento).", Alert.AlertType.INFORMATION);
+            mostrarAlerta("Información", "Este tipo de ciudadano no genera adeudos (vocal u otro exento).",
+                    Alert.AlertType.INFORMATION);
             return;
         }
 
@@ -403,7 +438,8 @@ public class FaenasController {
         int exitos = 0;
         for (String item : items) {
             MesAnio ma = parseMesAnio(item);
-            if (ma == null) continue;
+            if (ma == null)
+                continue;
 
             Faena faena = new Faena();
             faena.setAnio(ma.anio);
@@ -428,14 +464,16 @@ public class FaenasController {
 
     @FXML
     private void onPagarSeleccionados() {
-        if (listaAdeudos == null) return;
+        if (listaAdeudos == null)
+            return;
         ObservableList<String> seleccion = listaAdeudos.getSelectionModel().getSelectedItems();
         pagarMeses(new ArrayList<>(seleccion)); // copia para evitar problemas si se limpia la lista
     }
 
     @FXML
     private void onPagarTodos() {
-        if (listaAdeudos == null) return;
+        if (listaAdeudos == null)
+            return;
         pagarMeses(new ArrayList<>(listaAdeudos.getItems()));
     }
 
@@ -492,15 +530,22 @@ public class FaenasController {
         }
         ciudadanoSeleccionado = null;
 
-        if (lblNombreCiudadano != null) lblNombreCiudadano.setText("");
-        if (lblTipoCiudadano != null) lblTipoCiudadano.setText("");
-        if (tablaFaenas != null) tablaFaenas.getItems().clear();
+        if (lblNombreCiudadano != null)
+            lblNombreCiudadano.setText("");
+        if (lblTipoCiudadano != null)
+            lblTipoCiudadano.setText("");
+        if (tablaFaenas != null)
+            tablaFaenas.getItems().clear();
 
         int anioActual = LocalDate.now().getYear();
-        if (cbAnio != null) cbAnio.getSelectionModel().select(Integer.valueOf(anioActual));
-        if (cbMes != null) cbMes.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
-        if (chkAsistencia != null) chkAsistencia.setSelected(true);
-        if (dpFechaRegistro != null) dpFechaRegistro.setValue(LocalDate.now());
+        if (cbAnio != null)
+            cbAnio.getSelectionModel().select(Integer.valueOf(anioActual));
+        if (cbMes != null)
+            cbMes.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
+        if (chkAsistencia != null)
+            chkAsistencia.setSelected(true);
+        if (dpFechaRegistro != null)
+            dpFechaRegistro.setValue(LocalDate.now());
 
         limpiarAdeudos();
         actualizarPagoReposicion();
@@ -515,15 +560,18 @@ public class FaenasController {
     }
 
     private void limpiarCamposFaena() {
-        if (chkAsistencia != null) chkAsistencia.setSelected(true);
-        if (dpFechaRegistro != null) dpFechaRegistro.setValue(LocalDate.now());
+        if (chkAsistencia != null)
+            chkAsistencia.setSelected(true);
+        if (dpFechaRegistro != null)
+            dpFechaRegistro.setValue(LocalDate.now());
         actualizarPagoReposicion();
     }
 
     private boolean validarFormularioBasico() {
         if (ciudadanoSeleccionado == null) {
             mostrarAlerta("Validación", "Debe seleccionar un ciudadano válido.", Alert.AlertType.WARNING);
-            if (txtIdCiudadano != null) txtIdCiudadano.requestFocus();
+            if (txtIdCiudadano != null)
+                txtIdCiudadano.requestFocus();
             return false;
         }
         return true;

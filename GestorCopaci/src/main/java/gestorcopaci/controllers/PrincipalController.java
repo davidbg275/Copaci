@@ -98,60 +98,88 @@ private void onFaenas() {
 
 
     @FXML
-private void onCooperaciones() {
-    try {
-        FXMLLoader loader = new FXMLLoader(
-                App.class.getResource("views/cooperaciones.fxml")
-        );
-        Parent root = loader.load();
-        
-        Stage stage = new Stage();
-        stage.setTitle("Registro de Cooperaciones - Sistema Copaci");
-        stage.setScene(new Scene(root));
-        stage.setResizable(false);
-        
-        stage.show();
-        
-        // Actualizar la interfaz principal
-        lblTitulo.setText("Módulo de Cooperaciones");
-        lblContenido.setText("Ventana de registro de cooperaciones abierta.");
-        
-    } catch (Exception e) {
-        e.printStackTrace();
-        error("Error", "No se pudo abrir el módulo de cooperaciones:\n" + e.getMessage());
+    private void onCooperaciones() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    App.class.getResource("views/cooperaciones.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.setTitle("Registro de Cooperaciones - Sistema Copaci");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            
+            stage.show();
+            
+            // Actualizar la interfaz principal
+            lblTitulo.setText("Módulo de Cooperaciones");
+            lblContenido.setText("Ventana de registro de cooperaciones abierta.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            error("Error", "No se pudo abrir el módulo de cooperaciones:\n" + e.getMessage());
+        }
     }
-}
 
     @FXML
-private void onDonaciones() {
-    try {
-        FXMLLoader loader = new FXMLLoader(
-                App.class.getResource("views/donaciones.fxml")
-        );
-        Parent root = loader.load();
-        
-        Stage stage = new Stage();
-        stage.setTitle("Registro de Donaciones - Sistema Copaci");
-        stage.setScene(new Scene(root));
-        stage.setResizable(false);
-        
-        stage.show();
-        
-        // Actualizar la interfaz principal
-        lblTitulo.setText("Módulo de Donaciones");
-        lblContenido.setText("Ventana de registro de donaciones abierta.");
-        
-    } catch (Exception e) {
-        e.printStackTrace();
-        error("Error", "No se pudo abrir el módulo de donaciones:\n" + e.getMessage());
+    private void onDonaciones() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    App.class.getResource("views/donaciones.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.setTitle("Registro de Donaciones - Sistema Copaci");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            
+            stage.show();
+            
+            // Actualizar la interfaz principal
+            lblTitulo.setText("Módulo de Donaciones");
+            lblContenido.setText("Ventana de registro de donaciones abierta.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            error("Error", "No se pudo abrir el módulo de donaciones:\n" + e.getMessage());
+        }
     }
-}
 
     @FXML
     private void onBitacora() {
-        lblTitulo.setText("Módulo de Asistencia");
-        lblContenido.setText("Aquí irá la bitácora de asistencias.");
-        info("Asistencia", "Redirigiendo a: Módulo de Asistencia (por implementar)");
+        try {
+            // Cargar la interfaz de gestión de vocales
+            FXMLLoader loader = new FXMLLoader(
+                    App.class.getResource("views/gestion_vocales.fxml")
+            );
+            Parent root = loader.load();
+            
+            // Crear nueva ventana
+            Stage stage = new Stage();
+            stage.setTitle("Gestión de Vocales - Sistema Copaci");
+            stage.setScene(new Scene(root));
+            stage.setResizable(true);
+            stage.setMinWidth(800);
+            stage.setMinHeight(600);
+            
+            // Configurar para que se cierre correctamente
+            stage.setOnCloseRequest(event -> {
+                lblTitulo.setText("Bienvenido al Sistema Copaci");
+                lblContenido.setText("Gestión de vocales cerrada");
+            });
+            
+            stage.show();
+            
+            // Actualizar la interfaz principal
+            lblTitulo.setText("Módulo de Gestión de Vocales");
+            lblContenido.setText("Ventana de gestión de vocales abierta. Puede minimizar esta ventana para acceder al módulo.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            error("Error", "No se pudo abrir el módulo de gestión de vocales:\n" + e.getMessage());
+        }
     }
 
     @FXML
