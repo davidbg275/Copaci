@@ -1,5 +1,8 @@
 package gestorcopaci.controllers;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import gestorcopaci.App;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,8 +14,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class PrincipalController implements Initializable {
 
@@ -72,12 +73,29 @@ public class PrincipalController implements Initializable {
         }
     }
 
-    @FXML
-    private void onFaenas() {
+@FXML
+private void onFaenas() {
+    try {
+        FXMLLoader loader = new FXMLLoader(
+                App.class.getResource("views/faenas.fxml")
+        );
+        Parent root = loader.load();
+
+        Stage stage = new Stage();
+        stage.setTitle("Registro de Faenas - Sistema Copaci");
+        stage.setScene(new Scene(root));
+        stage.setResizable(false);
+        stage.show();
+
         lblTitulo.setText("Módulo de Faenas");
-        lblContenido.setText("Aquí irá el manejo de faenas.");
-        info("Faenas", "Redirigiendo a: Módulo de Faenas (por implementar)");
+        lblContenido.setText("Ventana de registro de faenas abierta.");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        error("Error", "No se pudo abrir el módulo de faenas:\n" + e.getMessage());
     }
+}
+
 
     @FXML
 private void onCooperaciones() {
