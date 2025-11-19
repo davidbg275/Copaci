@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gestorcopaci.controllers.AsignarVocalController" spacing="20" 
+      style="-fx-padding: 20; -fx-background-color: white;" prefWidth="400" prefHeight="300">
+    
+    <Label text="Asignar Nuevo Vocal" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    
+    <VBox spacing="10">
+        <Label text="ID del Ciudadano:" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="txtIdCiudadano" promptText="Ingrese el ID del ciudadano"/>
+        <Label text="Nota: El ciudadano debe estar registrado en el sistema" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+    </VBox>
+    
+    <!-- Panel de información del ciudadano -->
+    <VBox fx:id="panelInfoCiudadano" spacing="5" style="-fx-background-color: #ecf0f1; -fx-padding: 10; -fx-border-color: #bdc3c7; -fx-border-radius: 5;">
+        <Label text="Información del Ciudadano:" style="-fx-font-weight: bold;"/>
+        <Label fx:id="lblInfoCiudadano" text="" style="-fx-font-size: 14px;"/>
+    </VBox>
+    
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button fx:id="btnCancelar" text="Cancelar" 
+                style="-fx-background-color: #95a5a6; -fx-text-fill: white;"
+                onAction="#handleCancelar"/>
+        <Button fx:id="btnAsignar" text="Asignar Vocal" 
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"
+                onAction="#handleAsignar"/>
+    </HBox>
+</VBox>

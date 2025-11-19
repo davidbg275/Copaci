@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gestorcopaci.controllers.GestionVocalesController" spacing="20" 
+      style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
+    
+    <Label text="Gestión de Vocales" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    
+    <!-- Barra de botones -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <Button fx:id="btnAsignarVocal" text="Asignar Nuevo Vocal" 
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"
+                onAction="#handleAsignarVocal"/>
+        <Button fx:id="btnRegistrarAsistencia" text="Registrar Asistencia" 
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"
+                onAction="#handleRegistrarAsistencia"/>
+        <Button fx:id="btnVerDetalles" text="Ver Detalles" 
+                style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;"
+                onAction="#handleVerDetalles"/>
+        <Button fx:id="btnActualizar" text="Actualizar" 
+                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold;"
+                onAction="#handleActualizar"/>
+    </HBox>
+    
+    <!-- Tabla de vocales -->
+    <TableView fx:id="tablaVocales" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colIdVocal" text="ID Vocal" prefWidth="80"/>
+            <TableColumn fx:id="colNombre" text="Ciudadano" prefWidth="150"/>
+            <TableColumn fx:id="colFechaInicio" text="Inicio Mandato" prefWidth="120"/>
+            <TableColumn fx:id="colFechaFin" text="Fin Mandato" prefWidth="120"/>
+            <TableColumn fx:id="colEventosAsistidos" text="Eventos Asistidos" prefWidth="120"/>
+            <TableColumn fx:id="colPorcentaje" text="Porcentaje" prefWidth="100"/>
+            <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+</VBox>
