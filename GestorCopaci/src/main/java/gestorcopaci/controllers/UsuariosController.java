@@ -5,6 +5,8 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import gestorcopaci.daos.AsistenciaDAO;
 import gestorcopaci.daos.CiudadanoDAO;
@@ -15,6 +17,9 @@ import gestorcopaci.models.Ciudadano;
 import gestorcopaci.models.Cooperacion;
 import gestorcopaci.models.Faena;
 import gestorcopaci.models.Vocal;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -26,6 +31,26 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 public class UsuariosController {
+
+    // ==== CLASE INTERNA PARA MOSTRAR FAENAS POR MES ====
+    public static class FaenaResumen {
+        private final int anio;
+        private final String mes;
+        private final String estado;
+        private final double monto;
+
+        public FaenaResumen(int anio, String mes, String estado, double monto) {
+            this.anio = anio;
+            this.mes = mes;
+            this.estado = estado;
+            this.monto = monto;
+        }
+
+        public int getAnio() { return anio; }
+        public String getMes() { return mes; }
+        public String getEstado() { return estado; }
+        public double getMonto() { return monto; }
+    }
 
     // BUSCADOR
     @FXML private TextField txtBuscar;
@@ -50,13 +75,13 @@ public class UsuariosController {
     @FXML private Label lblLugarNacimiento;
     @FXML private Label lblGradoEstudios;
 
-    // FAENAS
-    @FXML private TableView<Faena> tblFaenas;
-    @FXML private TableColumn<Faena, Integer> colFaenaAnio;
-    @FXML private TableColumn<Faena, String> colFaenaMes;
-    @FXML private TableColumn<Faena, String> colFaenaAsistencia;
-    @FXML private TableColumn<Faena, Number> colFaenaPago;
-    @FXML private TableColumn<Faena, String> colFaenaFecha;
+    // FAENAS (USAMOS FaenaResumen)
+    @FXML private TableView<FaenaResumen> tblFaenas;
+    @FXML private TableColumn<FaenaResumen, Integer> colFaenaAnio;
+    @FXML private TableColumn<FaenaResumen, String> colFaenaMes;
+    @FXML private TableColumn<FaenaResumen, String> colFaenaAsistencia;
+    @FXML private TableColumn<FaenaResumen, Number> colFaenaPago;
+    @FXML private TableColumn<FaenaResumen, String> colFaenaFecha; // aquí pondremos vacío
     @FXML private Label lblResumenFaenas;
 
     // COOPERACIONES
@@ -82,7 +107,7 @@ public class UsuariosController {
     private AsistenciaDAO asistenciaDAO;
 
     private final ObservableList<Ciudadano> listaCiudadanos = FXCollections.observableArrayList();
-    private final ObservableList<Faena> listaFaenas = FXCollections.observableArrayList();
+    private final ObservableList<FaenaResumen> listaFaenas = FXCollections.observableArrayList();
     private final ObservableList<Cooperacion> listaCooperaciones = FXCollections.observableArrayList();
 
     private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -106,35 +131,30 @@ public class UsuariosController {
     }
 
     private void configurarTablaCiudadanos() {
-        colId.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getIdCiudadano()).asObject());
-        colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
-        colManzana.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getManzana()));
-        colTipo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getTipoCiudadano()));
+        colId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getIdCiudadano()).asObject());
+        colNombre.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNombre()));
+        colManzana.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getManzana()));
+        colTipo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getTipoCiudadano()));
     }
 
     private void configurarTablaFaenas() {
-        colFaenaAnio.setCellValueFactory(f -> new javafx.beans.property.SimpleIntegerProperty(f.getValue().getAnio()).asObject());
-        colFaenaMes.setCellValueFactory(f -> new javafx.beans.property.SimpleStringProperty(f.getValue().getMes()));
-        colFaenaAsistencia.setCellValueFactory(f -> new javafx.beans.property.SimpleStringProperty(
-                f.getValue().isAsistencia() ? "Asistió" : "No asistió"));
-        colFaenaPago.setCellValueFactory(f -> new javafx.beans.property.SimpleDoubleProperty(f.getValue().getPagoReposicion()));
-        colFaenaFecha.setCellValueFactory(f -> {
-            LocalDate fecha = f.getValue().getFechaRegistro();
-            String txt = (fecha != null) ? fecha.format(fmt) : "";
-            return new javafx.beans.property.SimpleStringProperty(txt);
-        });
+        colFaenaAnio.setCellValueFactory(f -> new SimpleIntegerProperty(f.getValue().getAnio()).asObject());
+        colFaenaMes.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getMes()));
+        colFaenaAsistencia.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getEstado()));
+        colFaenaPago.setCellValueFactory(f -> new SimpleDoubleProperty(f.getValue().getMonto()));
+        colFaenaFecha.setCellValueFactory(f -> new SimpleStringProperty("")); // no manejamos fecha por mes
 
         tblFaenas.setItems(listaFaenas);
     }
 
     private void configurarTablaCooperaciones() {
-        colCoopAnio.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getAnio()).asObject());
-        colCoopTipo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getTipoPago()));
-        colCoopTotal.setCellValueFactory(c -> new javafx.beans.property.SimpleDoubleProperty(c.getValue().getTotalPagado()));
+        colCoopAnio.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getAnio()).asObject());
+        colCoopTipo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getTipoPago()));
+        colCoopTotal.setCellValueFactory(c -> new SimpleDoubleProperty(c.getValue().getTotalPagado()));
         colCoopFecha.setCellValueFactory(c -> {
             LocalDate fecha = c.getValue().getFechaRegistro();
             String txt = (fecha != null) ? fecha.format(fmt) : "";
-            return new javafx.beans.property.SimpleStringProperty(txt);
+            return new SimpleStringProperty(txt);
         });
 
         tblCooperaciones.setItems(listaCooperaciones);
@@ -203,14 +223,8 @@ public class UsuariosController {
         lblLugarNacimiento.setText(safe(c.getLugarNacimiento()));
         lblGradoEstudios.setText(safe(c.getGradoEstudios()));
 
-        // FAENAS
-        List<Faena> faenas = faenaDAO.obtenerFaenasPorCiudadano(c.getIdCiudadano());
-        listaFaenas.setAll(faenas);
-        long totalFaenas = faenas.size();
-        long asistidas = faenas.stream().filter(Faena::isAsistencia).count();
-        lblResumenFaenas.setText("Total registros: " + totalFaenas +
-                " | Asistidas: " + asistidas +
-                " | No asistió (paga): " + (totalFaenas - asistidas));
+        // FAENAS -> RESUMEN MENSUAL
+        llenarResumenFaenas(c);
 
         // COOPERACIONES
         List<Cooperacion> cooperaciones = cooperacionDAO.obtenerCooperacionesPorCiudadano(c.getIdCiudadano());
@@ -218,14 +232,18 @@ public class UsuariosController {
         double totalCoops = cooperaciones.stream()
                 .mapToDouble(Cooperacion::getTotalPagado)
                 .sum();
-        lblResumenCoops.setText("Total de cooperaciones registradas: " + cooperaciones.size() +
+        lblResumenCoops.setText("Total registros: " + cooperaciones.size() +
                 " | Monto acumulado: $" + String.format(Locale.US, "%.2f", totalCoops));
 
         // VOCAL / ASISTENCIAS
         Vocal vocal = vocalDAO.obtenerVocalPorCiudadano(c.getIdCiudadano());
         if (vocal != null) {
             lblEstadoVocal.setText("Es vocal (" + vocal.getEstado() + ")");
-            lblPeriodoVocal.setText(vocal.getFechaInicioMandato() + "  -  " + vocal.getFechaFinMandato());
+            lblPeriodoVocal.setText(
+                    (vocal.getFechaInicioMandato() != null ? vocal.getFechaInicioMandato().toString() : "?")
+                            + "  -  " +
+                    (vocal.getFechaFinMandato() != null ? vocal.getFechaFinMandato().toString() : "?")
+            );
             lblEventosAsistidos.setText(String.valueOf(vocal.getEventosAsistidos()));
             lblPorcentajeAsistencia.setText(
                     String.format(Locale.US, "%.2f %%", vocal.getPorcentajeAsistencia())
@@ -243,6 +261,78 @@ public class UsuariosController {
             lblPorcentajeAsistencia.setText("-");
             lblMensajeVocal.setText("");
         }
+    }
+
+    /**
+     * Genera SIEMPRE 12 filas (enero-diciembre) para el año actual,
+     * con estado: Pagado / No pagado / No aplica (vocal).
+     */
+    private void llenarResumenFaenas(Ciudadano c) {
+        listaFaenas.clear();
+
+        int anioActual = LocalDate.now().getYear();
+
+        // Traemos faenas reales desde BD (si las tienes)
+        List<Faena> faenasDb = faenaDAO.obtenerFaenasPorCiudadanoYAnio(c.getIdCiudadano(), anioActual);
+        Map<String, Faena> porMes = faenasDb.stream()
+                .collect(Collectors.toMap(
+                        f -> f.getMes().toLowerCase(Locale.ROOT),
+                        f -> f,
+                        (a, b) -> a
+                ));
+
+        // ¿Es vocal activo?
+        boolean esVocal = vocalDAO.esVocalActivo(c.getIdCiudadano());
+
+        String[] meses = {
+                "Enero", "Febrero", "Marzo", "Abril",
+                "Mayo", "Junio", "Julio", "Agosto",
+                "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        };
+
+        int countPagado = 0;
+        int countNoPagado = 0;
+        int countNoAplica = 0;
+
+        for (String mes : meses) {
+            String mesKey = mes.toLowerCase(Locale.ROOT);
+            String estado;
+            double monto;
+
+            if (esVocal) {
+                estado = "No aplica (vocal)";
+                monto = 0.0;
+                countNoAplica++;
+            } else {
+                Faena f = porMes.get(mesKey);
+                if (f != null) {
+                    // Si asistió o pagó reposición -> lo consideramos "Pagado"
+                    if (f.isAsistencia() || f.getPagoReposicion() > 0.0) {
+                        estado = "Pagado";
+                        monto = f.getPagoReposicion();
+                        countPagado++;
+                    } else {
+                        // registro sin asistencia y sin pago
+                        estado = "No pagado";
+                        monto = 0.0;
+                        countNoPagado++;
+                    }
+                } else {
+                    // No existe registro en BD para este mes -> No pagado
+                    estado = "No pagado";
+                    monto = 0.0;
+                    countNoPagado++;
+                }
+            }
+
+            listaFaenas.add(new FaenaResumen(anioActual, mes, estado, monto));
+        }
+
+        lblResumenFaenas.setText(
+                "Pagado: " + countPagado +
+                " | No pagado: " + countNoPagado +
+                " | No aplica (vocal): " + countNoAplica
+        );
     }
 
     private void limpiarExpediente() {
