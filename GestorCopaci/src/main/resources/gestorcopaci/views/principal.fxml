@@ -7,37 +7,127 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="gestorcopaci.controllers.PrincipalController">
+            fx:controller="gestorcopaci.controllers.PrincipalController"
+            prefWidth="900" prefHeight="600"
+            style="-fx-background-color: linear-gradient(to bottom, #e2eeff, #ffffff);">
 
-    <!-- Top: logo + título -->
-    <top>
-        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 15;">
-            <ImageView fx:id="imgLogo" fitHeight="80" fitWidth="80"/>
-            <Label fx:id="lblTitulo"
-                   text="Bienvenido al Sistema Copaci"
-                   style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
-        </HBox>
-    </top>
-
-    <!-- Left: menú -->
+    <!-- Menú lateral estilo tarjeta -->
     <left>
-        <VBox spacing="10" style="-fx-padding: 15;">
-            <Button text="Dashboard"        onAction="#onDashboard"/>
-            <Button text="Registro"         onAction="#onRegistro"/>
-            <Button text="Faenas"           onAction="#onFaenas"/>
-            <Button text="Cooperaciones"    onAction="#onCooperaciones"/>
-            <Button text="Donaciones"       onAction="#onDonaciones"/>
-            <Button text="Asistencia"       onAction="#onBitacora"/>
-            <Button text="Usuarios"         onAction="#onUsuarios"/>
-            <Button text="Cerrar sesión"    onAction="#onCerrarSesion"/>
-        </VBox>
+        <StackPane BorderPane.alignment="CENTER_LEFT" style="-fx-padding: 20 0 20 20;">
+            <VBox spacing="8"
+                  prefWidth="180"
+                  style="
+                    -fx-background-color: #e5f0ff;
+                    -fx-background-radius: 20;
+                    -fx-padding: 20 10 20 10;">
+                <Label text="Dashboard"
+                       style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-padding: 4 0 10 10;"/>
+
+                <!-- Botón dashboard (solo visual, no necesita onAction) -->
+                <Button text="Dashboard"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: #ffffff;
+                            -fx-text-fill: #2563eb;
+                            -fx-font-weight: bold;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+
+                <Separator/>
+
+                <Button text="Registro"
+                        onAction="#onRegistro"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: transparent;
+                            -fx-text-fill: #1f2937;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+                <Button text="Faenas"
+                        onAction="#onFaenas"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: transparent;
+                            -fx-text-fill: #1f2937;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+                <Button text="Cooperaciones"
+                        onAction="#onCooperaciones"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: transparent;
+                            -fx-text-fill: #1f2937;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+                <Button text="Donaciones"
+                        onAction="#onDonaciones"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: transparent;
+                            -fx-text-fill: #1f2937;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+                <Button text="Asistencia"
+                        onAction="#onBitacora"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: transparent;
+                            -fx-text-fill: #1f2937;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+                <Button text="Usuarios"
+                        onAction="#onUsuarios"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: transparent;
+                            -fx-text-fill: #1f2937;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <Button text="Cerrar sesión"
+                        onAction="#onCerrarSesion"
+                        maxWidth="Infinity"
+                        style="
+                            -fx-background-radius: 12;
+                            -fx-background-color: #fee2e2;
+                            -fx-text-fill: #b91c1c;
+                            -fx-alignment: CENTER_LEFT;
+                            -fx-padding: 8 12 8 16;"/>
+            </VBox>
+        </StackPane>
     </left>
 
-    <!-- Center: contenido placeholder -->
+    <!-- Centro: logo + título + subtítulo -->
     <center>
-        <Label fx:id="lblContenido"
-               text="Selecciona un módulo del menú"
-               style="-fx-font-size: 18px;"
-               BorderPane.alignment="CENTER"/>
+        <StackPane style="-fx-padding: 40 40 40 20;">
+            <VBox spacing="20" alignment="CENTER" maxWidth="500">
+                <!-- Logo centrado -->
+                <ImageView fx:id="imgLogo"
+                           fitHeight="90" fitWidth="90"
+                           preserveRatio="true"
+                           StackPane.alignment="CENTER"/>
+
+                <!-- Título principal -->
+                <Label fx:id="lblTitulo"
+                       text="Bienvenido al Sistema Copaci"
+                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+
+                <!-- Subtítulo / mensaje -->
+                <Label fx:id="lblContenido"
+                       text="Selecciona un módulo del menú"
+                       style="-fx-font-size: 16px; -fx-text-fill: #6b7280;"/>
+
+            </VBox>
+        </StackPane>
     </center>
+
 </BorderPane>
