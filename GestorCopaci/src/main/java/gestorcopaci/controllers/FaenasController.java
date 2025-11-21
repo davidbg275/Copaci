@@ -1,6 +1,7 @@
 package gestorcopaci.controllers;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -85,7 +86,7 @@ public class FaenasController {
 
     private FaenaDAO faenaDAO;
     private CiudadanoDAO ciudadanoDAO;
-    private VocalDAO vocalDAO; // <--- nuevo
+    private VocalDAO vocalDAO;
     private Ciudadano ciudadanoSeleccionado;
 
     // ---------- CAMPOS LÓGICOS ----------
@@ -97,138 +98,188 @@ public class FaenasController {
     // ---------- INITIALIZE ----------
 
     @FXML
-    private void initialize() {
-        faenaDAO = new FaenaDAO();
-        ciudadanoDAO = new CiudadanoDAO();
-        vocalDAO = new VocalDAO(); // <--- nuevo
 
-        int anioActual = LocalDate.now().getYear();
+private void initialize() {
+    faenaDAO = new FaenaDAO();
+    ciudadanoDAO = new CiudadanoDAO();
+    vocalDAO = new VocalDAO();
 
-        // Años
-        if (cbAnio != null) {
-            for (int a = anioActual - 5; a <= anioActual + 1; a++) {
-                cbAnio.getItems().add(a);
-            }
-            cbAnio.getSelectionModel().select(Integer.valueOf(anioActual));
-            cbAnio.valueProperty().addListener((obs, o, n) -> cargarFaenas());
-        }
+    int anioActual = LocalDate.now().getYear();
 
-        // Meses
-        if (cbMes != null) {
-            cbMes.getItems().addAll(MESES);
-            cbMes.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
-        }
-
-        // Fecha
-        if (dpFechaRegistro != null) {
-            dpFechaRegistro.setValue(LocalDate.now());
-        }
-
-        // Tabla de faenas
-        if (tablaFaenas != null) {
-            colAnio.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getAnio()));
-            colMes.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getMes()));
-            colAsistencia.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isAsistencia() ? "Sí" : "No"));
-            colPago.setCellValueFactory(
-                    c -> new SimpleStringProperty(String.format("$ %.2f", c.getValue().getPagoReposicion())));
-            colFecha.setCellValueFactory(c -> new SimpleStringProperty(
-                    c.getValue().getFechaRegistro() != null
-                            ? c.getValue().getFechaRegistro().toString()
-                            : ""));
-        }
-
-        // Lista de adeudos: selección múltiple
-        if (listaAdeudos != null) {
-            listaAdeudos.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            listaAdeudos.getItems().clear();
-        }
-        if (lblTotalAdeudo != null) {
-            lblTotalAdeudo.setText("$ 0.00");
-        }
-
-        // Listeners
-        if (txtIdCiudadano != null) {
-            txtIdCiudadano.textProperty().addListener((obs, oldVal, newVal) -> buscarCiudadano());
-        }
-        if (chkAsistencia != null) {
-            chkAsistencia.selectedProperty().addListener((obs, oldVal, newVal) -> actualizarPagoReposicion());
-        }
-
-        actualizarPagoReposicion();
+    // Años - NO cargar años aquí, se cargarán cuando se seleccione un ciudadano
+    if (cbAnio != null) {
+        // Solo inicializar el combobox vacío
+        cbAnio.valueProperty().addListener((obs, o, n) -> cargarFaenas());
     }
+
+    // Meses
+    if (cbMes != null) {
+        cbMes.getItems().addAll(MESES);
+        cbMes.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
+    }
+
+    // El resto del código initialize permanece igual...
+    // Fecha
+    if (dpFechaRegistro != null) {
+        dpFechaRegistro.setValue(LocalDate.now());
+    }
+
+    // Tabla de faenas
+    if (tablaFaenas != null) {
+        colAnio.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getAnio()));
+        colMes.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getMes()));
+        colAsistencia.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isAsistencia() ? "Sí" : "No"));
+        colPago.setCellValueFactory(
+                c -> new SimpleStringProperty(String.format("$ %.2f", c.getValue().getPagoReposicion())));
+        colFecha.setCellValueFactory(c -> new SimpleStringProperty(
+                c.getValue().getFechaRegistro() != null
+                        ? c.getValue().getFechaRegistro().toString()
+                        : ""));
+    }
+
+    // Lista de adeudos: selección múltiple
+    if (listaAdeudos != null) {
+        listaAdeudos.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listaAdeudos.getItems().clear();
+    }
+    if (lblTotalAdeudo != null) {
+        lblTotalAdeudo.setText("$ 0.00");
+    }
+
+    // Listeners
+    if (txtIdCiudadano != null) {
+        txtIdCiudadano.textProperty().addListener((obs, oldVal, newVal) -> buscarCiudadano());
+    }
+    if (chkAsistencia != null) {
+        chkAsistencia.selectedProperty().addListener((obs, oldVal, newVal) -> actualizarPagoReposicion());
+    }
+
+    actualizarPagoReposicion();
+}
 
     // ---------- LÓGICA PRINCIPAL ----------
 
-    private void buscarCiudadano() {
-        if (txtIdCiudadano == null)
-            return;
+private void buscarCiudadano() {
+    if (txtIdCiudadano == null)
+        return;
 
-        String idText = txtIdCiudadano.getText().trim();
-        ciudadanoSeleccionado = null;
+    String idText = txtIdCiudadano.getText().trim();
+    ciudadanoSeleccionado = null;
+
+    if (lblNombreCiudadano != null) {
+        lblNombreCiudadano.setText("");
+    }
+    if (lblTipoCiudadano != null) {
+        lblTipoCiudadano.setText("");
+    }
+    if (tablaFaenas != null) {
+        tablaFaenas.getItems().clear();
+    }
+    limpiarAdeudos();
+    actualizarPagoReposicion();
+
+    if (idText.isEmpty()) {
+        return;
+    }
+
+    try {
+        int id = Integer.parseInt(idText);
+        List<Ciudadano> ciudadanos = ciudadanoDAO.obtenerTodosCiudadanos();
+
+        for (Ciudadano c : ciudadanos) {
+            if (c.getIdCiudadano() == id) {
+                ciudadanoSeleccionado = c;
+
+                if (lblNombreCiudadano != null) {
+                    lblNombreCiudadano.setText("Ciudadano: " + c.getNombre());
+                    lblNombreCiudadano.setStyle("-fx-text-fill: #4caf50; -fx-font-weight: bold;");
+                }
+
+                String tipo = c.getTipoCiudadano() != null ? c.getTipoCiudadano() : "Ciudadano";
+                String tipoLower = tipo.toLowerCase();
+
+                String detalle;
+                if (tipoLower.contains("vocal")) {
+                    detalle = "Vocal (100% descuento en faenas)";
+                } else if (tipoLower.contains("estudiante") || tipoLower.contains("madre")) {
+                    detalle = tipo + " (50% descuento en faenas)";
+                } else {
+                    detalle = tipo + " (paga faena completa)";
+                }
+
+                if (lblTipoCiudadano != null) {
+                    lblTipoCiudadano.setText(detalle);
+                }
+
+                // ACTUALIZAR AÑOS DISPONIBLES BASADO EN CUÁNDO CUMPLIÓ 18 AÑOS
+                actualizarAniosDisponibles();
+
+                cargarFaenas();
+                actualizarPagoReposicion();
+                return;
+            }
+        }
 
         if (lblNombreCiudadano != null) {
-            lblNombreCiudadano.setText("");
-        }
-        if (lblTipoCiudadano != null) {
-            lblTipoCiudadano.setText("");
-        }
-        if (tablaFaenas != null) {
-            tablaFaenas.getItems().clear();
-        }
-        limpiarAdeudos();
-        actualizarPagoReposicion();
-
-        if (idText.isEmpty()) {
-            return;
+            lblNombreCiudadano.setText("Ciudadano no encontrado");
+            lblNombreCiudadano.setStyle("-fx-text-fill: #f44336; -fx-font-weight: bold;");
         }
 
-        try {
-            int id = Integer.parseInt(idText);
-            List<Ciudadano> ciudadanos = ciudadanoDAO.obtenerTodosCiudadanos();
-
-            for (Ciudadano c : ciudadanos) {
-                if (c.getIdCiudadano() == id) {
-                    ciudadanoSeleccionado = c;
-
-                    if (lblNombreCiudadano != null) {
-                        lblNombreCiudadano.setText("Ciudadano: " + c.getNombre());
-                        lblNombreCiudadano.setStyle("-fx-text-fill: #4caf50; -fx-font-weight: bold;");
-                    }
-
-                    String tipo = c.getTipoCiudadano() != null ? c.getTipoCiudadano() : "Ciudadano";
-                    String tipoLower = tipo.toLowerCase();
-
-                    String detalle;
-                    if (tipoLower.contains("vocal")) {
-                        detalle = "Vocal (100% descuento en faenas)";
-                    } else if (tipoLower.contains("estudiante") || tipoLower.contains("madre")) {
-                        detalle = tipo + " (50% descuento en faenas)";
-                    } else {
-                        detalle = tipo + " (paga faena completa)";
-                    }
-
-                    if (lblTipoCiudadano != null) {
-                        lblTipoCiudadano.setText(detalle);
-                    }
-
-                    cargarFaenas();
-                    actualizarPagoReposicion();
-                    return;
-                }
-            }
-
-            if (lblNombreCiudadano != null) {
-                lblNombreCiudadano.setText("Ciudadano no encontrado");
-                lblNombreCiudadano.setStyle("-fx-text-fill: #f44336; -fx-font-weight: bold;");
-            }
-
-        } catch (NumberFormatException e) {
-            if (lblNombreCiudadano != null) {
-                lblNombreCiudadano.setText("ID inválido");
-                lblNombreCiudadano.setStyle("-fx-text-fill: #f44336; -fx-font-weight: bold;");
-            }
+    } catch (NumberFormatException e) {
+        if (lblNombreCiudadano != null) {
+            lblNombreCiudadano.setText("ID inválido");
+            lblNombreCiudadano.setStyle("-fx-text-fill: #f44336; -fx-font-weight: bold;");
         }
     }
+}
+
+/**
+ * Actualiza los años disponibles en el combobox basado en cuándo el ciudadano cumplió 18 años
+ */
+private void actualizarAniosDisponibles() {
+    if (cbAnio == null || ciudadanoSeleccionado == null) {
+        return;
+    }
+
+    // Limpiar años actuales
+    cbAnio.getItems().clear();
+
+    LocalDate hoy = LocalDate.now();
+    int anioActual = hoy.getYear();
+
+    // Calcular año en que cumplió 18 años
+    LocalDate nacimiento = ciudadanoSeleccionado.getFechaNacimiento();
+    if (nacimiento == null) {
+        // Si no tiene fecha de nacimiento, mostrar últimos 5 años
+        for (int a = anioActual - 5; a <= anioActual + 1; a++) {
+            cbAnio.getItems().add(a);
+        }
+        cbAnio.getSelectionModel().select(Integer.valueOf(anioActual));
+        return;
+    }
+
+    LocalDate fechaCumple18 = nacimiento.plusYears(18);
+    int anioCumple18 = fechaCumple18.getYear();
+
+    // Si aún no cumple 18 años, no mostrar años
+    if (fechaCumple18.isAfter(hoy)) {
+        cbAnio.getItems().clear();
+        return;
+    }
+
+    // Mostrar años desde que cumplió 18 hasta el año actual + 1 (para futuras faenas)
+    for (int anio = anioCumple18; anio <= anioActual + 1; anio++) {
+        cbAnio.getItems().add(anio);
+    }
+
+    // Seleccionar el año actual por defecto (si está disponible)
+    if (cbAnio.getItems().contains(anioActual)) {
+        cbAnio.getSelectionModel().select(Integer.valueOf(anioActual));
+    } else if (!cbAnio.getItems().isEmpty()) {
+        // Si el año actual no está disponible, seleccionar el último año disponible
+        cbAnio.getSelectionModel().selectLast();
+    }
+}
 
     private void actualizarPagoReposicion() {
         double pago = 0.0;
@@ -322,48 +373,70 @@ public class FaenasController {
         LocalDate hoy = LocalDate.now();
         int anioSeleccionado = cbAnio.getValue();
 
-        // Si el año es futuro, no hay adeudos
-        if (anioSeleccionado > hoy.getYear()) {
+        // Obtener fecha de registro (usar fecha de alta del ciudadano o fecha actual)
+        LocalDate fechaRegistro = ciudadanoSeleccionado.getFechaAlta() != null 
+                ? ciudadanoSeleccionado.getFechaAlta() 
+                : hoy;
+
+        // Calcular fecha cuando cumplió 18 años
+        LocalDate nacimiento = ciudadanoSeleccionado.getFechaNacimiento();
+        if (nacimiento == null) {
+            return; // No podemos calcular sin fecha de nacimiento
+        }
+
+        LocalDate fechaCumple18 = nacimiento.plusYears(18);
+
+        // Si el ciudadano aún no cumple 18 años, no tiene adeudos
+        if (fechaCumple18.isAfter(fechaRegistro)) {
             return;
         }
 
-        // Año límite para meses (hasta el mes actual si es el mismo año)
-        int mesLimite = (anioSeleccionado < hoy.getYear())
-                ? 12
-                : hoy.getMonthValue();
-
-        // A partir de cuándo empieza a deber (18 años cumplidos)
-        int mesInicio = 1;
-        LocalDate nacimiento = ciudadanoSeleccionado.getFechaNacimiento();
-        if (nacimiento != null) {
-            LocalDate fecha18 = nacimiento.plusYears(18);
-            int anio18 = fecha18.getYear();
-            if (anioSeleccionado < anio18) {
-                // Todavía no tenía 18 ese año
-                return;
-            }
-            if (anioSeleccionado == anio18) {
-                mesInicio = fecha18.getMonthValue();
-            }
-        }
-
-        // Meses ya registrados (asistidos o pagados)
+        // Calcular todos los meses desde que cumplió 18 hasta la fecha de registro para el año seleccionado
+        List<MesAnio> todosLosMesesAdeudo = calcularMesesAdeudoCompleto(fechaCumple18, fechaRegistro, anioSeleccionado);
+        
+        // Filtrar meses que ya están registrados (pagados o asistidos)
         Set<String> mesesConRegistro = faenasDelAnio.stream()
-                .map(f -> normalizarMes(f.getMes()))
+                .map(f -> normalizarMes(f.getMes()) + "_" + f.getAnio())
                 .collect(Collectors.toSet());
 
         int adeudos = 0;
-        for (int m = mesInicio; m <= mesLimite; m++) {
-            String nombreMes = MESES.get(m - 1);
-            String claveMes = normalizarMes(nombreMes);
+        for (MesAnio mesAnio : todosLosMesesAdeudo) {
+            String claveMes = normalizarMes(mesAnio.nombreMes) + "_" + mesAnio.anio;
             if (!mesesConRegistro.contains(claveMes)) {
-                listaAdeudos.getItems().add(nombreMes + " " + anioSeleccionado);
+                listaAdeudos.getItems().add(mesAnio.nombreMes + " " + mesAnio.anio);
                 adeudos++;
             }
         }
 
         double total = adeudos * montoPorMes;
         lblTotalAdeudo.setText(String.format("$ %.2f", total));
+    }
+
+    /**
+     * Calcula todos los meses de adeudo desde que cumplió 18 años hasta la fecha de registro
+     * para el año seleccionado en el combobox
+     */
+    private List<MesAnio> calcularMesesAdeudoCompleto(LocalDate fechaCumple18, LocalDate fechaRegistro, int anioSeleccionado) {
+        List<MesAnio> mesesAdeudo = new ArrayList<>();
+        
+        // Empezar desde el mes siguiente a cumplir 18 años
+        YearMonth inicio = YearMonth.from(fechaCumple18).plusMonths(1);
+        // Hasta el mes anterior al registro (o mes actual si es anterior)
+        YearMonth fin = YearMonth.from(fechaRegistro);
+        
+        YearMonth current = inicio;
+        while (!current.isAfter(fin)) {
+            // Solo incluir meses del año seleccionado
+            if (current.getYear() == anioSeleccionado) {
+                MesAnio mesAnio = new MesAnio();
+                mesAnio.nombreMes = MESES.get(current.getMonthValue() - 1);
+                mesAnio.anio = current.getYear();
+                mesesAdeudo.add(mesAnio);
+            }
+            current = current.plusMonths(1);
+        }
+        
+        return mesesAdeudo;
     }
 
     private String normalizarMes(String mes) {
@@ -524,32 +597,34 @@ public class FaenasController {
     }
 
     @FXML
-    private void onLimpiar() {
-        if (txtIdCiudadano != null) {
-            txtIdCiudadano.clear();
-        }
-        ciudadanoSeleccionado = null;
-
-        if (lblNombreCiudadano != null)
-            lblNombreCiudadano.setText("");
-        if (lblTipoCiudadano != null)
-            lblTipoCiudadano.setText("");
-        if (tablaFaenas != null)
-            tablaFaenas.getItems().clear();
-
-        int anioActual = LocalDate.now().getYear();
-        if (cbAnio != null)
-            cbAnio.getSelectionModel().select(Integer.valueOf(anioActual));
-        if (cbMes != null)
-            cbMes.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
-        if (chkAsistencia != null)
-            chkAsistencia.setSelected(true);
-        if (dpFechaRegistro != null)
-            dpFechaRegistro.setValue(LocalDate.now());
-
-        limpiarAdeudos();
-        actualizarPagoReposicion();
+private void onLimpiar() {
+    if (txtIdCiudadano != null) {
+        txtIdCiudadano.clear();
     }
+    ciudadanoSeleccionado = null;
+
+    if (lblNombreCiudadano != null)
+        lblNombreCiudadano.setText("");
+    if (lblTipoCiudadano != null)
+        lblTipoCiudadano.setText("");
+    if (tablaFaenas != null)
+        tablaFaenas.getItems().clear();
+
+    // Limpiar años cuando se limpia el formulario
+    if (cbAnio != null)
+        cbAnio.getItems().clear();
+    
+    int anioActual = LocalDate.now().getYear();
+    if (cbMes != null)
+        cbMes.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
+    if (chkAsistencia != null)
+        chkAsistencia.setSelected(true);
+    if (dpFechaRegistro != null)
+        dpFechaRegistro.setValue(LocalDate.now());
+
+    limpiarAdeudos();
+    actualizarPagoReposicion();
+}
 
     @FXML
     private void onCancelar() {

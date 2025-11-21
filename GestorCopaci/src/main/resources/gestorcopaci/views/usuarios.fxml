@@ -142,7 +142,6 @@
                                                 <TableColumn fx:id="colFaenaMes" text="Mes" prefWidth="80"/>
                                                 <TableColumn fx:id="colFaenaAsistencia" text="Asistencia" prefWidth="90"/>
                                                 <TableColumn fx:id="colFaenaPago" text="Pago reposición" prefWidth="120"/>
-                                                <TableColumn fx:id="colFaenaFecha" text="Fecha registro" prefWidth="120"/>
                                             </columns>
                                         </TableView>
                                         <Label fx:id="lblResumenFaenas"
@@ -162,7 +161,6 @@
                                                 <TableColumn fx:id="colCoopAnio" text="Año" prefWidth="60"/>
                                                 <TableColumn fx:id="colCoopTipo" text="Tipo" prefWidth="140"/>
                                                 <TableColumn fx:id="colCoopTotal" text="Total pagado" prefWidth="100"/>
-                                                <TableColumn fx:id="colCoopFecha" text="Fecha registro" prefWidth="120"/>
                                             </columns>
                                         </TableView>
                                         <Label fx:id="lblResumenCoops"

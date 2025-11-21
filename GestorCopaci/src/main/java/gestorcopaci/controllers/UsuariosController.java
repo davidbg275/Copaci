@@ -75,21 +75,21 @@ public class UsuariosController {
     @FXML private Label lblLugarNacimiento;
     @FXML private Label lblGradoEstudios;
 
-    // FAENAS (USAMOS FaenaResumen)
+    // FAENAS (USAMOS FaenaResumen) - SOLO 4 COLUMNAS COMO EN EL FXML
     @FXML private TableView<FaenaResumen> tblFaenas;
     @FXML private TableColumn<FaenaResumen, Integer> colFaenaAnio;
     @FXML private TableColumn<FaenaResumen, String> colFaenaMes;
     @FXML private TableColumn<FaenaResumen, String> colFaenaAsistencia;
     @FXML private TableColumn<FaenaResumen, Number> colFaenaPago;
-    @FXML private TableColumn<FaenaResumen, String> colFaenaFecha; // aquí pondremos vacío
+    // ELIMINADO: colFaenaFecha
     @FXML private Label lblResumenFaenas;
 
-    // COOPERACIONES
+    // COOPERACIONES - SOLO 3 COLUMNAS COMO EN EL FXML
     @FXML private TableView<Cooperacion> tblCooperaciones;
     @FXML private TableColumn<Cooperacion, Integer> colCoopAnio;
     @FXML private TableColumn<Cooperacion, String> colCoopTipo;
     @FXML private TableColumn<Cooperacion, Number> colCoopTotal;
-    @FXML private TableColumn<Cooperacion, String> colCoopFecha;
+    // ELIMINADO: colCoopFecha
     @FXML private Label lblResumenCoops;
 
     // VOCAL / ASISTENCIA
@@ -142,8 +142,6 @@ public class UsuariosController {
         colFaenaMes.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getMes()));
         colFaenaAsistencia.setCellValueFactory(f -> new SimpleStringProperty(f.getValue().getEstado()));
         colFaenaPago.setCellValueFactory(f -> new SimpleDoubleProperty(f.getValue().getMonto()));
-        colFaenaFecha.setCellValueFactory(f -> new SimpleStringProperty("")); // no manejamos fecha por mes
-
         tblFaenas.setItems(listaFaenas);
     }
 
@@ -151,12 +149,7 @@ public class UsuariosController {
         colCoopAnio.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getAnio()).asObject());
         colCoopTipo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getTipoPago()));
         colCoopTotal.setCellValueFactory(c -> new SimpleDoubleProperty(c.getValue().getTotalPagado()));
-        colCoopFecha.setCellValueFactory(c -> {
-            LocalDate fecha = c.getValue().getFechaRegistro();
-            String txt = (fecha != null) ? fecha.format(fmt) : "";
-            return new SimpleStringProperty(txt);
-        });
-
+        // ELIMINADO: configuración de colCoopFecha
         tblCooperaciones.setItems(listaCooperaciones);
     }
 
@@ -264,25 +257,46 @@ public class UsuariosController {
     }
 
     /**
-     * Genera SIEMPRE 12 filas (enero-diciembre) para el año actual,
-     * con estado: Pagado / No pagado / No aplica (vocal).
+     * Genera resumen de faenas desde que cumplió 18 años hasta la fecha actual,
+     * mostrando todos los meses (pagados y no pagados)
      */
     private void llenarResumenFaenas(Ciudadano c) {
         listaFaenas.clear();
 
-        int anioActual = LocalDate.now().getYear();
+        // Obtener TODAS las faenas del ciudadano
+        List<Faena> todasLasFaenas = faenaDAO.obtenerFaenasPorCiudadano(c.getIdCiudadano());
 
-        // Traemos faenas reales desde BD (si las tienes)
-        List<Faena> faenasDb = faenaDAO.obtenerFaenasPorCiudadanoYAnio(c.getIdCiudadano(), anioActual);
-        Map<String, Faena> porMes = faenasDb.stream()
-                .collect(Collectors.toMap(
-                        f -> f.getMes().toLowerCase(Locale.ROOT),
-                        f -> f,
-                        (a, b) -> a
-                ));
+        // Calcular fecha cuando cumplió 18 años
+        LocalDate nacimiento = c.getFechaNacimiento();
+        if (nacimiento == null) {
+            // Si no tiene fecha de nacimiento, mostrar solo los últimos 5 años
+            llenarResumenUltimosAnios(todasLasFaenas, c);
+            return;
+        }
+
+        LocalDate fechaCumple18 = nacimiento.plusYears(18);
+        LocalDate hoy = LocalDate.now();
+
+        // Si el ciudadano aún no cumple 18 años, no mostrar nada
+        if (fechaCumple18.isAfter(hoy)) {
+            lblResumenFaenas.setText("Ciudadano aún no cumple 18 años.");
+            return;
+        }
 
         // ¿Es vocal activo?
         boolean esVocal = vocalDAO.esVocalActivo(c.getIdCiudadano());
+
+        // Calcular rango de años: desde el año que cumplió 18 hasta año actual
+        int anioInicio = fechaCumple18.getYear();
+        int anioFin = hoy.getYear();
+
+        // Agrupar faenas existentes por año y mes para consulta rápida
+        Map<String, Faena> faenasExistentes = todasLasFaenas.stream()
+                .collect(Collectors.toMap(
+                        f -> f.getAnio() + "_" + f.getMes().toLowerCase(Locale.ROOT),
+                        f -> f,
+                        (a, b) -> a
+                ));
 
         String[] meses = {
                 "Enero", "Febrero", "Marzo", "Abril",
@@ -294,45 +308,154 @@ public class UsuariosController {
         int countNoPagado = 0;
         int countNoAplica = 0;
 
-        for (String mes : meses) {
-            String mesKey = mes.toLowerCase(Locale.ROOT);
-            String estado;
-            double monto;
+        // Generar todos los meses desde que cumplió 18 hasta la fecha actual
+        for (int anio = anioInicio; anio <= anioFin; anio++) {
+            for (int mesIndex = 0; mesIndex < meses.length; mesIndex++) {
+                String mes = meses[mesIndex];
+                int mesNumero = mesIndex + 1;
+                
+                // Crear fecha para este mes-año
+                LocalDate fechaMes = LocalDate.of(anio, mesNumero, 1);
+                
+                // Saltar meses antes de cumplir 18 (en el año que cumplió 18)
+                if (anio == anioInicio && fechaMes.isBefore(fechaCumple18)) {
+                    continue;
+                }
+                
+                // Saltar meses futuros (en el año actual)
+                if (anio == anioFin && fechaMes.isAfter(hoy)) {
+                    continue;
+                }
 
-            if (esVocal) {
-                estado = "No aplica (vocal)";
-                monto = 0.0;
-                countNoAplica++;
-            } else {
-                Faena f = porMes.get(mesKey);
-                if (f != null) {
-                    // Si asistió o pagó reposición -> lo consideramos "Pagado"
-                    if (f.isAsistencia() || f.getPagoReposicion() > 0.0) {
-                        estado = "Pagado";
-                        monto = f.getPagoReposicion();
-                        countPagado++;
+                String estado;
+                double monto;
+
+                if (esVocal) {
+                    estado = "No aplica (vocal)";
+                    monto = 0.0;
+                    countNoAplica++;
+                } else {
+                    // Buscar si existe faena para este mes-año
+                    String clave = anio + "_" + mes.toLowerCase(Locale.ROOT);
+                    Faena faena = faenasExistentes.get(clave);
+                    
+                    if (faena != null) {
+                        if (faena.isAsistencia() || faena.getPagoReposicion() > 0.0) {
+                            estado = "Pagado";
+                            monto = faena.getPagoReposicion();
+                            countPagado++;
+                        } else {
+                            estado = "No pagado";
+                            monto = 0.0;
+                            countNoPagado++;
+                        }
                     } else {
-                        // registro sin asistencia y sin pago
                         estado = "No pagado";
                         monto = 0.0;
                         countNoPagado++;
                     }
-                } else {
-                    // No existe registro en BD para este mes -> No pagado
-                    estado = "No pagado";
-                    monto = 0.0;
-                    countNoPagado++;
                 }
-            }
 
-            listaFaenas.add(new FaenaResumen(anioActual, mes, estado, monto));
+                listaFaenas.add(new FaenaResumen(anio, mes, estado, monto));
+            }
         }
 
-        lblResumenFaenas.setText(
-                "Pagado: " + countPagado +
-                " | No pagado: " + countNoPagado +
-                " | No aplica (vocal): " + countNoAplica
-        );
+        // Si no hay registros, mostrar mensaje
+        if (listaFaenas.isEmpty()) {
+            lblResumenFaenas.setText("No hay meses en el período de obligación.");
+        } else {
+            lblResumenFaenas.setText(
+                    "Total meses obligatorios: " + listaFaenas.size() +
+                    " | Pagado: " + countPagado +
+                    " | No pagado: " + countNoPagado +
+                    " | No aplica (vocal): " + countNoAplica
+            );
+        }
+    }
+
+    /**
+     * Método para cuando no hay fecha de nacimiento (muestra últimos 5 años)
+     */
+    private void llenarResumenUltimosAnios(List<Faena> todasLasFaenas, Ciudadano c) {
+        LocalDate hoy = LocalDate.now();
+        int anioFin = hoy.getYear();
+        int anioInicio = anioFin - 4; // Últimos 5 años
+
+        boolean esVocal = vocalDAO.esVocalActivo(c.getIdCiudadano());
+
+        // Agrupar faenas existentes
+        Map<String, Faena> faenasExistentes = todasLasFaenas.stream()
+                .collect(Collectors.toMap(
+                        f -> f.getAnio() + "_" + f.getMes().toLowerCase(Locale.ROOT),
+                        f -> f,
+                        (a, b) -> a
+                ));
+
+        String[] meses = {
+                "Enero", "Febrero", "Marzo", "Abril",
+                "Mayo", "Junio", "Julio", "Agosto",
+                "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        };
+
+        int countPagado = 0;
+        int countNoPagado = 0;
+        int countNoAplica = 0;
+
+        // Generar últimos 5 años
+        for (int anio = anioInicio; anio <= anioFin; anio++) {
+            for (int mesIndex = 0; mesIndex < meses.length; mesIndex++) {
+                String mes = meses[mesIndex];
+                int mesNumero = mesIndex + 1;
+                
+                // Saltar meses futuros
+                LocalDate fechaMes = LocalDate.of(anio, mesNumero, 1);
+                if (fechaMes.isAfter(hoy)) {
+                    continue;
+                }
+
+                String estado;
+                double monto;
+
+                if (esVocal) {
+                    estado = "No aplica (vocal)";
+                    monto = 0.0;
+                    countNoAplica++;
+                } else {
+                    String clave = anio + "_" + mes.toLowerCase(Locale.ROOT);
+                    Faena faena = faenasExistentes.get(clave);
+                    
+                    if (faena != null) {
+                        if (faena.isAsistencia() || faena.getPagoReposicion() > 0.0) {
+                            estado = "Pagado";
+                            monto = faena.getPagoReposicion();
+                            countPagado++;
+                        } else {
+                            estado = "No pagado";
+                            monto = 0.0;
+                            countNoPagado++;
+                        }
+                    } else {
+                        estado = "No pagado";
+                        monto = 0.0;
+                        countNoPagado++;
+                    }
+                }
+
+                listaFaenas.add(new FaenaResumen(anio, mes, estado, monto));
+            }
+        }
+
+        if (listaFaenas.isEmpty()) {
+            lblResumenFaenas.setText("No hay registros de faenas.");
+        } else {
+            lblResumenFaenas.setText(
+                    "Total meses (últimos 5 años): " + listaFaenas.size() +
+                    " | Pagado: " + countPagado +
+                    " | No pagado: " + countNoPagado +
+                    " | No aplica (vocal): " + countNoAplica +
+                    " (Sin fecha de nacimiento)"
+            );
+        }
     }
 
     private void limpiarExpediente() {
